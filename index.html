@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Svarun Soda, Computer Science M.S. graduate researching temporal and oscillator-based unconventional computation (PHOSCO thesis), with industry experience in ML, embedded systems, and astrophotonics at NASA JPL, Caltech, and Medtronic.">
+    <title>Svarun Soda</title>
+    <style>
+        :root {
+            --bg:       #070b17;
+            --bg2:      #0c1020;
+            --bg3:      #111828;
+            --card:     #0d1422;
+            --border:   #1b2640;
+            --accent:   #00c8ff;
+            --accent2:  #7b5fff;
+            --text:     #e4e8f0;
+            --muted:    #7a8599;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        h1, h2, h3, h4 { font-weight: bold; -webkit-text-stroke: 0.3px currentColor; }
+        em, i { font-style: normal; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        /* ── Starfield ── */
+        #stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: fixed;
+            inset-block-start: 0;
+            inset-inline: 0;
+            z-index: 200;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            background: rgba(7, 11, 23, 0.82);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-logo img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 10px rgba(0,200,255,.3);
+            transition: box-shadow .2s, transform .2s;
+        }
+
+        .nav-logo:hover img {
+            box-shadow: 0 0 18px rgba(0,200,255,.55);
+            transform: scale(1.07);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: .78rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active { color: var(--accent); }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all .3s;
+        }
+
+        /* ── Layout ── */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem 2rem;
+        }
+
+        /* ── Hero ── */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 0 2.5rem;
+        }
+
+        .hero-inner {
+            max-width: 1060px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .hero-text { flex: 1; }
+
+        .hero-name {
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: .8rem;
+        }
+
+        .hero-name em {
+            font-style: normal;
+            color: inherit;
+        }
+
+        .hero-subtitle {
+            font-size: 1.05rem;
+            color: var(--muted);
+            margin-bottom: 1.6rem;
+            line-height: 1.5;
+        }
+
+        .hero-summary {
+            font-size: .97rem;
+            color: var(--muted);
+            max-width: 560px;
+            margin-bottom: 2.4rem;
+            line-height: 1.85;
+        }
+
+        .btn-row { display: flex; gap: .9rem; flex-wrap: wrap; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .72rem 1.6rem;
+            border-radius: 7px;
+            font-size: .88rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: transform .18s, background .18s, box-shadow .18s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #070b17;
+            box-shadow: 0 0 20px rgba(0,200,255,.25);
+        }
+
+        .btn-primary:hover {
+            background: #00b0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 28px rgba(0,200,255,.4);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(0,200,255,.08);
+            transform: translateY(-2px);
+        }
+
+        .hero-photo { flex-shrink: 0; }
+
+        .hero-photo img {
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 50px rgba(0,200,255,.22);
+            display: block;
+        }
+
+        /* ── Section chrome ── */
+        .section-head { margin-bottom: 2.8rem; }
+
+        .section-head h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-bottom: .45rem;
+        }
+
+        .section-head h2 em {
+            font-style: normal;
+            color: inherit;
+        }
+
+        .section-bar {
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* ── About ── */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.4rem;
+        }
+
+        .about-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem 1.7rem;
+            transition: border-color .2s;
+        }
+
+        .about-card:hover { border-color: rgba(0,200,255,.45); }
+
+        .about-card-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: .7rem;
+        }
+
+        .about-card p {
+            font-size: .9rem;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .about-summary { grid-column: 1 / -1; }
+
+        /* ── Timeline ── */
+        .timeline {
+            position: relative;
+            padding-left: 1.8rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 1.8rem;
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-1.8rem - 5px);
+            top: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2.5px solid var(--bg);
+            box-shadow: 0 0 12px rgba(0,200,255,.55);
+        }
+
+        .tl-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem 1.6rem;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .tl-card:hover {
+            border-color: rgba(0,200,255,.5);
+            transform: translateX(5px);
+        }
+
+        .tl-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .2rem;
+        }
+
+        .tl-org {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .tl-date {
+            font-size: .75rem;
+            color: var(--accent);
+            background: rgba(0,200,255,.1);
+            padding: .18rem .65rem;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .tl-role {
+            font-size: .88rem;
+            color: var(--accent2);
+            margin-bottom: .3rem;
+        }
+
+        .tl-loc {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-bottom: .8rem;
+        }
+
+        .tl-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+        }
+
+        .tl-bullets li {
+            font-size: .88rem;
+            color: var(--muted);
+            padding-left: 1.1rem;
+            position: relative;
+        }
+
+        .tl-bullets li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: .75rem;
+            top: .05rem;
+        }
+
+        /* ── Skills ── */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.3rem;
+        }
+
+        .skill-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem;
+            transition: border-color .2s;
+        }
+
+        .skill-card:hover { border-color: rgba(0,200,255,.45); }
+
+        .skill-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: .9rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .45rem;
+        }
+
+        .tag {
+            background: rgba(0,200,255,.08);
+            color: var(--text);
+            border: 1px solid rgba(0,200,255,.18);
+            padding: .28rem .7rem;
+            border-radius: 20px;
+            font-size: .82rem;
+        }
+
+        /* ── Projects ── */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.4rem;
+        }
+
+        .proj-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            transition: border-color .2s, transform .22s;
+        }
+
+        .proj-card:hover {
+            border-color: rgba(0,200,255,.5);
+            transform: translateY(-4px);
+        }
+
+        .proj-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: .5rem;
+        }
+
+        .proj-name {
+            font-weight: 700;
+            font-size: .97rem;
+            line-height: 1.3;
+        }
+
+        .proj-year {
+            font-size: .75rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .proj-org {
+            font-size: .82rem;
+            color: var(--accent);
+        }
+
+        .proj-desc {
+            font-size: .87rem;
+            color: var(--muted);
+            line-height: 1.75;
+            flex: 1;
+        }
+
+        .proj-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+        .proj-tag {
+            background: rgba(123,95,255,.12);
+            color: #b09dff;
+            border: 1px solid rgba(123,95,255,.25);
+            padding: .22rem .6rem;
+            border-radius: 4px;
+            font-size: .74rem;
+            font-weight: 600;
+        }
+
+        /* ── Publications ── */
+        .pub-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .pub-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            padding: 1.2rem 1.5rem;
+            transition: background .2s;
+        }
+
+        .pub-card:hover { background: var(--bg3); }
+
+        .pub-title {
+            font-size: .93rem;
+            color: var(--text);
+            margin-bottom: .4rem;
+            line-height: 1.55;
+        }
+
+        .pub-meta {
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        .pub-doi {
+            color: var(--accent);
+            text-decoration: none;
+            margin-left: .5rem;
+            font-size: .78rem;
+        }
+
+        .pub-doi:hover { text-decoration: underline; }
+
+        /* ── Contact ── */
+        #contact-section { text-align: center; }
+
+        .contact-sub {
+            color: var(--muted);
+            font-size: .97rem;
+            max-width: 480px;
+            margin: 0 auto 2.6rem;
+            line-height: 1.75;
+        }
+
+        .contact-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.4rem;
+        }
+
+        .contact-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .55rem;
+            text-decoration: none;
+            color: var(--muted);
+            transition: color .2s, transform .2s;
+            padding: .5rem;
+        }
+
+        .contact-card:hover {
+            color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .contact-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .contact-card:hover .contact-icon {
+            border-color: var(--accent);
+            box-shadow: 0 0 16px rgba(0,200,255,.3);
+        }
+
+        .contact-label { font-size: .82rem; font-weight: 600; }
+
+        /* ── Footer ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            font-size: .78rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Fade-in ── */
+        .fi {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .55s ease, transform .55s ease;
+        }
+
+        .fi.on { opacity: 1; transform: translateY(0); }
+
+        /* ── Responsive ── */
+        @media (max-width: 760px) {
+            #hero { padding: 0 1.5rem; }
+            .hero-inner { flex-direction: column-reverse; gap: 2rem; text-align: center; }
+            .btn-row { justify-content: center; }
+            .hero-summary { margin-left: auto; margin-right: auto; }
+            nav { padding: 0 1.5rem; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 58px; left: 0; right: 0;
+                background: var(--bg2);
+                padding: 1.6rem;
+                gap: 1.1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .container { padding: 4.5rem 1.4rem 2rem; }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-summary { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- ── Navigation ── -->
+<nav>
+    <a href="#" class="nav-logo">
+        <img src="assets/profpic.jpg" alt="Svarun Soda">
+    </a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="thesis.html" style="color:var(--accent2);">Thesis</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact-section">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<!-- ── Hero ── -->
+<section id="hero">
+    <div class="hero-inner">
+        <div class="hero-text">
+            <h1 class="hero-name">Svarun <em>Soda</em></h1>
+            <p class="hero-subtitle">CS M.S. Graduate &nbsp;·&nbsp; Unconventional Computation Researcher &nbsp;·&nbsp; Embedded Systems Engineer</p>
+            <p class="hero-summary">
+                M.S. Computer Science graduate (CSUN, 2026) whose thesis introduced PHOSCO, a novel oscillator-based temporal computing framework encoding analog values as phase differences. Industry experience at NASA JPL, Caltech, and Medtronic spans ML pipelines for Mars rovers, photonic instrumentation for space telescopes, and safety-critical medical firmware.
+            </p>
+            <div class="btn-row">
+                <a href="#contact-section" class="btn btn-primary">Get In Touch</a>
+                <a href="thesis.html" class="btn btn-ghost">Read Thesis</a>
+                <a href="assets/Resume_Soda.pdf" class="btn btn-ghost" download>Download CV</a>
+            </div>
+        </div>
+        <div class="hero-photo">
+            <img src="assets/profpic.jpg" alt="Svarun Soda" onerror="this.style.display='none'">
+        </div>
+    </div>
+</section>
+
+<!-- ── About ── -->
+<div class="container" id="about">
+    <div class="section-head fi">
+        <h2>About <em>Me</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="about-grid">
+
+        <div class="about-card about-summary fi">
+            <div class="about-card-label">Professional Summary</div>
+            <p>I am a recent M.S. Computer Science graduate from California State University, Northridge. My research centers on <em>unconventional computational models</em>, specifically oscillator-based temporal computing systems that encode and process analog values through phase relationships rather than binary logic. I am broadly interested in low-level systems, novel computational architectures, and the intersection of hardware and software. My academic work is complemented by industry experience in aerospace, astrophotonics, and medical devices.</p>
+        </div>
+
+        <div class="about-card fi">
+            <div class="about-card-label">Research Focus: Temporal Computing</div>
+            <p>My M.S. thesis, <em>Phase-based Oscillatory Computation (PHOSCO)</em>, proposes a discrete-time analog computing framework where numerical values are stored as relative phase differences (Δφ) between pairs of concurrently-running oscillators. The work introduces oscillator pausing mechanics for value storage, derives four linear arithmetic operations from conditional pausing logic circuits, and validates the framework through a custom-built 6-oscillator prototype with full evaluation of storage longevity and operation precision. <a href="thesis.html" style="color:var(--accent);text-decoration:none;font-weight:700;">Read the thesis →</a></p>
+        </div>
+
+        <div class="about-card fi">
+            <div class="about-card-label">Industry Experience</div>
+            <p>Engineering roles at NASA's Jet Propulsion Laboratory (ML intern on AEGIS, the autonomous science targeting system deployed on <em>Curiosity</em> and <em>Perseverance</em>), the Caltech Exoplanet Laboratory (two internships developing photonic instrumentation software for the Keck II telescope's HISPEC spectrograph), and Medtronic MiniMed (software verification co-op for insulin delivery firmware). Each role involved tightly integrated hardware–software systems operating in high-reliability environments.</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Education ── -->
+<div class="container" id="education">
+    <div class="section-head fi">
+        <h2><em>Education</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="timeline">
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">California State University, Northridge</span>
+                    <span class="tl-date">Aug 2024 – May 2026</span>
+                </div>
+                <div class="tl-role">M.S. in Computer Science</div>
+                <div class="tl-loc">📍 Northridge, CA &nbsp;|&nbsp; GPA: 3.86 / 4.0</div>
+                <ul class="tl-bullets">
+                    <li>Thesis: <em>Phase-based Oscillatory Computation (PHOSCO)</em>, investigating oscillator-based temporal computing models representing numerical information through continuously evolving phase relationships between oscillatory systems.</li>
+                    <li>Research combined embedded hardware experimentation, signal analysis, and theoretical computational modeling.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">California State University, Northridge</span>
+                    <span class="tl-date">Aug 2022 – May 2024</span>
+                </div>
+                <div class="tl-role">B.S. in Computer Science</div>
+                <div class="tl-loc">📍 Northridge, CA &nbsp;|&nbsp; GPA: 3.65 / 4.0</div>
+                <ul class="tl-bullets">
+                    <li>Award: Pearl Schuman Bloch Memorial Scholarship (2023)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">College of the Canyons</span>
+                    <span class="tl-date">Aug 2020 – Jun 2022</span>
+                </div>
+                <div class="tl-role">A.S. in Computer Science</div>
+                <div class="tl-loc">📍 Santa Clarita, CA &nbsp;|&nbsp; GPA: 3.34 / 4.0</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Experience ── -->
+<div class="container" id="experience">
+    <div class="section-head fi">
+        <h2>Work <em>Experience</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="timeline">
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">Medtronic Minimed</span>
+                    <span class="tl-date">Sep 2024 – May 2026</span>
+                </div>
+                <div class="tl-role">Software Verification Co-Op</div>
+                <div class="tl-loc">📍 Northridge, CA</div>
+                <ul class="tl-bullets">
+                    <li>Developed automated verification tools for embedded insulin delivery firmware using C# and JavaScript as part of a large-scale software verification team.</li>
+                    <li>Integrated software tooling with embedded hardware systems to validate reliability, compliance, and safety-critical behaviour.</li>
+                    <li>Identified and isolated firmware defects through accelerated verification testing; strengthened experience in hardware-integrated systems and safety-critical software validation.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">NASA Jet Propulsion Laboratory</span>
+                    <span class="tl-date">Jun 2024 – Aug 2024</span>
+                </div>
+                <div class="tl-role">AEGIS Machine Learning Intern</div>
+                <div class="tl-loc">📍 Pasadena, CA</div>
+                <ul class="tl-bullets">
+                    <li>Contributed to development of the AEGIS machine vision software deployed onboard the <em>Curiosity</em> and <em>Perseverance</em> Mars rovers, improving pattern-recognition performance by 29%.</li>
+                    <li>Developed Python-based machine learning and image-processing workflows for autonomous scientific imaging systems; used for specialized training and parameter-space explorations of the AEGIS software.</li>
+                    <li>Built modular Python pipelines using NASA's vision tools and open-source APIs; supported ground-truth labeling workflows for autonomous targeting.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">California Institute of Technology</span>
+                    <span class="tl-date">Jun 2023 – Aug 2023</span>
+                </div>
+                <div class="tl-role">Summer Research Intern, Exoplanet Laboratory</div>
+                <div class="tl-loc">📍 Pasadena, CA</div>
+                <ul class="tl-bullets">
+                    <li>Contributed to astrophotonics instrumentation development for the HISPEC spectrograph (Keck II telescope), focusing on optical hardware interfacing and data acquisition.</li>
+                    <li>Built Python-based serial and TCP software for hardware communication and optical spectrum dataset analysis.</li>
+                    <li>Collaborated with researchers on testing and integration of optical fiber switching hardware.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tl-item fi">
+            <div class="tl-card">
+                <div class="tl-top">
+                    <span class="tl-org">California Institute of Technology</span>
+                    <span class="tl-date">Sep 2022 – Jan 2023</span>
+                </div>
+                <div class="tl-role">Software Developer Intern, Exoplanet Laboratory</div>
+                <div class="tl-loc">📍 Pasadena, CA</div>
+                <ul class="tl-bullets">
+                    <li>Developed a flattening algorithm for the Dynamic Spectrum Flattener photonic chip, used for a Laser Frequency Comb (LFC) in astrophotonics instrumentation.</li>
+                    <li>Wrote Python software for hardware communication and processed and visualized light spectrum datasets using NumPy and Matplotlib.</li>
+                    <li>Co-authored several astrophotonics research publications presented at SPIE conferences.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Projects ── -->
+<div class="container" id="projects">
+    <div class="section-head fi">
+        <h2>Featured <em>Projects</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="projects-grid">
+
+        <div class="proj-card fi">
+            <div class="proj-top">
+                <span class="proj-name">PHOSCO: Phase-based Oscillatory Computation</span>
+                <span class="proj-year">2024 – 2026</span>
+            </div>
+            <div class="proj-org">CSUN · M.S. Thesis</div>
+            <p class="proj-desc">A novel discrete-time analog computing framework encoding numerical values as relative phase differences (Δφ) between oscillator pairs (TDVs). Derived four arithmetic operations (Copy, Inversion, Addition, Subtraction) from conditional oscillator pausing logic. Validated with a custom 6-oscillator prototype (custom PCBs, Teensy 4.1 MCUs) achieving ±10% operation precision and ±0.83 μs frequency convergence.</p>
+            <div class="proj-tags">
+                <span class="proj-tag">Temporal Computing</span>
+                <span class="proj-tag">Analog Oscillators</span>
+                <span class="proj-tag">Custom PCB Design</span>
+                <span class="proj-tag">C++ / Arduino</span>
+                <span class="proj-tag">Signal Analysis</span>
+            </div>
+            <a href="thesis.html" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;font-size:.8rem;font-weight:700;color:var(--accent2);text-decoration:none;border:1.5px solid rgba(123,95,255,.4);border-radius:6px;padding:.38rem .8rem;transition:background .2s;" onmouseover="this.style.background='rgba(123,95,255,.1)'" onmouseout="this.style.background='transparent'">Read Full Thesis →</a>
+        </div>
+
+        <div class="proj-card fi">
+            <div class="proj-top">
+                <span class="proj-name">AEGIS ML Pipeline, Mars Rover</span>
+                <span class="proj-year">2024</span>
+            </div>
+            <div class="proj-org">NASA JPL · Internship</div>
+            <p class="proj-desc">Contributed to development of the AEGIS machine vision software deployed onboard the <em>Curiosity</em> and <em>Perseverance</em> Mars rovers. Developed Python-based ML and image-processing workflows for autonomous scientific imaging, used for specialized training and parameter-space explorations, resulting in a 29% improvement in pattern-recognition performance.</p>
+            <div class="proj-tags">
+                <span class="proj-tag">Python</span>
+                <span class="proj-tag">Machine Learning</span>
+                <span class="proj-tag">Computer Vision</span>
+                <span class="proj-tag">Image Processing</span>
+            </div>
+        </div>
+
+        <div class="proj-card fi">
+            <div class="proj-top">
+                <span class="proj-name">NASA RockSat-X &amp; HASP Payloads</span>
+                <span class="proj-year">2021 – 2024</span>
+            </div>
+            <div class="proj-org">College of the Canyons · NASA-Sponsored</div>
+            <p class="proj-desc">Designed embedded control and sensor data-acquisition systems for upper-atmosphere and rocket payload missions. Wrote Arduino-based software for the HASP and RockSat-X platforms, including payload ejection control and sensor data logging. Performed CFD aerodynamics simulations for capsule wing design optimisation. Assisted with payload integration at Wallops Flight Facility.</p>
+            <div class="proj-tags">
+                <span class="proj-tag">Arduino / C</span>
+                <span class="proj-tag">Embedded Systems</span>
+                <span class="proj-tag">Sensor DAQ</span>
+                <span class="proj-tag">CFD</span>
+            </div>
+        </div>
+
+        <div class="proj-card fi">
+            <div class="proj-top">
+                <span class="proj-name">EDAmame: Open-Source EDA Suite</span>
+                <span class="proj-year">2023 – 2024</span>
+            </div>
+            <div class="proj-org">CSUN · Senior Design Project</div>
+            <p class="proj-desc">Contributed Java modules to an open-source Electronic Design Automation suite, enabling circuit design tooling workflows for the wider engineering community.</p>
+            <div class="proj-tags">
+                <span class="proj-tag">Java</span>
+                <span class="proj-tag">IntelliJ</span>
+                <span class="proj-tag">Open Source</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Publications ── -->
+<div class="container" id="publications">
+    <div class="section-head fi">
+        <h2>Research <em>Publications</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="pub-list">
+
+        <div class="pub-card fi">
+            <p class="pub-title">Recent upgrades to the Keck Planet Imager and Characterizer</p>
+            <p class="pub-meta">N. Jovanovic et al. &nbsp;·&nbsp; <em>Proceedings of SPIE</em>, Vol. 13096, 3019085 (2024)
+                <a class="pub-doi" href="https://doi.org/10.1117/12.3019085" target="_blank" rel="noopener">DOI ↗</a></p>
+        </div>
+
+        <div class="pub-card fi">
+            <p class="pub-title">Overview and status of the fiber delivery subsystem (FIB) of Keck/HISPEC, the diffraction-limited y-K band spectrograph for exoplanet characterization</p>
+            <p class="pub-meta">N. Jovanovic et al. &nbsp;·&nbsp; <em>Proceedings of SPIE</em>, Vol. 13096, 3020499 (2024)
+                <a class="pub-doi" href="https://doi.org/10.1117/12.3020499" target="_blank" rel="noopener">DOI ↗</a></p>
+        </div>
+
+        <div class="pub-card fi">
+            <p class="pub-title">Fiber-fed High-Resolution Infrared Spectroscopy at the Diffraction Limit</p>
+            <p class="pub-meta">N. Jovanovic et al. &nbsp;·&nbsp; <em>Proceedings of SPIE</em>, Vol. 13096, 3019238 (2024)
+                <a class="pub-doi" href="https://doi.org/10.1117/12.3019238" target="_blank" rel="noopener">DOI ↗</a></p>
+        </div>
+
+        <div class="pub-card fi">
+            <p class="pub-title">The Path to Detecting Extraterrestrial Life with Astrophotonics</p>
+            <p class="pub-meta">N. Jovanovic et al. &nbsp;·&nbsp; <em>Proceedings of SPIE</em>, Vol. 12680, 126800G (2023)
+                <a class="pub-doi" href="https://doi.org/10.1117/12.2677951" target="_blank" rel="noopener">DOI ↗</a></p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Skills ── -->
+<div class="container" id="skills">
+    <div class="section-head fi">
+        <h2>Technical <em>Skills</em></h2>
+        <div class="section-bar"></div>
+    </div>
+    <div class="skills-grid">
+
+        <div class="skill-card fi">
+            <div class="skill-label">Programming Languages</div>
+            <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">C++</span>
+                <span class="tag">C</span>
+                <span class="tag">C#</span>
+                <span class="tag">JavaScript</span>
+                <span class="tag">Java</span>
+                <span class="tag">Lua</span>
+            </div>
+        </div>
+
+        <div class="skill-card fi">
+            <div class="skill-label">Tools &amp; Environments</div>
+            <div class="tags">
+                <span class="tag">Visual Studio</span>
+                <span class="tag">Arduino IDE</span>
+                <span class="tag">KiCad</span>
+                <span class="tag">AutoCAD</span>
+                <span class="tag">IntelliJ</span>
+                <span class="tag">Git / GitHub</span>
+            </div>
+        </div>
+
+        <div class="skill-card fi">
+            <div class="skill-label">Libraries &amp; Frameworks</div>
+            <div class="tags">
+                <span class="tag">NumPy</span>
+                <span class="tag">Matplotlib</span>
+                <span class="tag">scikit-learn</span>
+                <span class="tag">PySerial</span>
+            </div>
+        </div>
+
+        <div class="skill-card fi">
+            <div class="skill-label">Specialties</div>
+            <div class="tags">
+                <span class="tag">Embedded Systems</span>
+                <span class="tag">Machine Learning</span>
+                <span class="tag">Analog Computing</span>
+                <span class="tag">Data Visualization</span>
+                <span class="tag">Photonics</span>
+                <span class="tag">Firmware Testing</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Contact ── -->
+<div class="container" id="contact-section">
+    <div class="section-head fi" style="text-align:center;">
+        <h2>Get In <em>Touch</em></h2>
+        <div class="section-bar" style="margin:0.45rem auto 0;"></div>
+    </div>
+    <p class="contact-sub fi">I'm open to research collaborations, full-time roles, and interesting projects. Feel free to reach out!</p>
+    <div class="contact-grid">
+
+        <a href="mailto:runsva2001@gmail.com" class="contact-card fi">
+            <div class="contact-icon">✉</div>
+            <span class="contact-label">runsva2001@gmail.com</span>
+        </a>
+
+        <a href="tel:+18188523202" class="contact-card fi">
+            <div class="contact-icon">📞</div>
+            <span class="contact-label">(818) 852-3202</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/svarunsoda" class="contact-card fi" target="_blank" rel="noopener">
+            <div class="contact-icon" style="font-weight:800;font-size:1rem;">in</div>
+            <span class="contact-label">LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/SvarunSoda" class="contact-card fi" target="_blank" rel="noopener">
+            <div class="contact-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </div>
+            <span class="contact-label">GitHub</span>
+        </a>
+
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Svarun Soda &nbsp;·&nbsp; Built with HTML, CSS &amp; JavaScript &nbsp;·&nbsp; Hosted on GitHub Pages</p>
+</footer>
+
+<script>
+(function () {
+    /* ── Starfield ── */
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [];
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function init() {
+        stars = Array.from({ length: 220 }, () => ({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.4 + 0.2,
+            a: Math.random() * 0.65 + 0.1,
+            da: (Math.random() - 0.5) * 0.008
+        }));
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        stars.forEach(s => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(210,225,255,${s.a.toFixed(2)})`;
+            ctx.fill();
+            s.a += s.da;
+            if (s.a > 0.8 || s.a < 0.08) s.da *= -1;
+        });
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); init(); });
+    resize(); init(); draw();
+
+    /* ── Mobile nav ── */
+    window.toggleMenu = function () {
+        document.getElementById('navLinks').classList.toggle('open');
+    };
+    document.querySelectorAll('.nav-links a').forEach(a =>
+        a.addEventListener('click', () =>
+            document.getElementById('navLinks').classList.remove('open')));
+
+    /* ── Fade-in on scroll ── */
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fi').forEach(el => io.observe(el));
+
+    /* ── Active nav highlight ── */
+    const sections = document.querySelectorAll('[id]');
+    const links    = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+        let cur = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 80) cur = s.id;
+        });
+        links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+        });
+    }, { passive: true });
+})();
+</script>
+<script>
+/* scroll position persistence */
+(function(){
+  var key='sp:'+location.pathname;
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  window.addEventListener('load',function(){
+    var y=sessionStorage.getItem(key);
+    if(y) window.scrollTo({top:+y,behavior:"instant"});
+  });
+  var t;
+  window.addEventListener('scroll',function(){
+    clearTimeout(t);
+    t=setTimeout(function(){sessionStorage.setItem(key,window.scrollY);},150);
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

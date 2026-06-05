@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Appendix A: Glossary – PHOSCO Thesis</title>
+<style>
+:root{--bg:#f7f0e2;--bg2:#ede4ce;--bg3:#e0d4b8;--card:#fbf6eb;
+  --border:#c8b890;--accent:#2e2c24;--text:#1c1a14;--muted:#5e5a4e;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);
+  font-family:'Times New Roman',Times,serif;font-size:.93rem;line-height:1.7;
+  overflow-x:hidden;}
+nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.8rem;background:rgba(247,240,226,.97);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.nav-back{display:flex;align-items:center;gap:.45rem;
+  text-decoration:none;color:var(--muted);font-size:.82rem;transition:color .2s;}
+.nav-back:hover{color:var(--text);}
+.nav-title{font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text);font-weight:700;}
+.page-wrap{max-width:900px;margin:0 auto;padding:5rem 2rem 6rem;}
+h1{font-size:1.4rem;font-weight:bold;color:var(--accent);
+  margin-bottom:1.6rem;padding-bottom:.4rem;border-bottom:2px solid var(--border);}
+/* Glossary table */
+.tbl-wrap{overflow-x:auto;margin:1.4rem 0;}
+table{width:100%;border-collapse:collapse;font-size:.9rem;}
+th{background:var(--bg2);font-weight:bold;padding:.55rem .8rem;
+  border:1px solid var(--border);text-align:center;color:var(--accent);}
+td{padding:.5rem .8rem;border:1px solid var(--border);vertical-align:middle;}
+tr:nth-child(even) td{background:var(--card);}
+td:first-child{background:var(--bg3);font-weight:bold;text-align:center;
+  font-size:.95rem;white-space:nowrap;}
+td code{font-family:'Courier New',Courier,monospace;font-size:.85em;
+  background:var(--bg3);border-radius:3px;padding:.05em .3em;}
+a{color:#5a3e1b;text-decoration:none;}
+a:hover{text-decoration:underline;}
+.tbl-cap{font-size:.82rem;color:var(--muted);text-align:center;
+  padding:.5rem 0 .2rem;margin-top:.3rem;}
+sub{font-size:.78em;}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../thesis.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2.5"
+     stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Thesis
+  </a>
+  <span class="nav-title">Appendix A – Glossary</span>
+</nav>
+
+<div class="page-wrap">
+<h1>Appendix A: Glossary</h1>
+
+<div class="tbl-wrap">
+  <table id="tab:glossary">
+    <thead>
+      <tr>
+        <th>Term</th>
+        <th>Meaning</th>
+        <th>Definition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>PHOSCO</td>
+        <td>Phase-based Oscillatory Computation</td>
+        <td><a href="../thesis.html#sec:phosco">Section 3.1</a></td>
+      </tr>
+      <tr>
+        <td>TDV</td>
+        <td>Time-Difference Variable</td>
+        <td><a href="../thesis.html#subsec:tdv">Section 2.2.1</a></td>
+      </tr>
+      <tr>
+        <td>t<sub>duty</sub></td>
+        <td>Duty-Cycle Duration</td>
+        <td><a href="../thesis.html#sec:tdvStorage">Section 3.2</a></td>
+      </tr>
+      <tr>
+        <td>∆Φ</td>
+        <td>Relative Phase Difference</td>
+        <td><a href="../thesis.html#sec:phosco">Section 3.1</a></td>
+      </tr>
+      <tr>
+        <td>f<sub>op</sub></td>
+        <td>Operation Circuit</td>
+        <td><a href="../thesis.html#sec:tdvOperations">Section 3.3</a></td>
+      </tr>
+      <tr>
+        <td>t<sub>ocd</sub></td>
+        <td>Operation Convergence Duration</td>
+        <td><a href="../thesis.html#sec:tdvOperations">Section 3.3</a></td>
+      </tr>
+      <tr>
+        <td>CO</td>
+        <td>Controllable Oscillator</td>
+        <td><a href="../thesis.html#sec:coDesign">Section 4.2</a></td>
+      </tr>
+      <tr>
+        <td>FCR</td>
+        <td>Frequency-Control Resistor</td>
+        <td><a href="../thesis.html#subsec:fcrDesign">Section 4.2.1</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="tbl-cap"><strong>Table A.1:</strong> Glossary of key terms and abbreviations used throughout the thesis.</p>
+</div>
+
+</div>
+<script>
+/* scroll position persistence */
+(function(){
+  var key='sp:'+location.pathname;
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  window.addEventListener('load',function(){
+    var y=sessionStorage.getItem(key);
+    if(y) window.scrollTo({top:+y,behavior:"instant"});
+  });
+  var t;
+  window.addEventListener('scroll',function(){
+    clearTimeout(t);
+    t=setTimeout(function(){sessionStorage.setItem(key,window.scrollY);},150);
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

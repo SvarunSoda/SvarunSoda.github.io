@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Appendix M: Evaluation Data Visualization Python Code – PHOSCO Thesis</title>
+
+<style>
+:root{--bg:#f7f0e2;--bg2:#ede4ce;--bg3:#e0d4b8;--card:#fbf6eb;
+  --border:#c8b890;--accent:#2e2c24;--text:#1c1a14;--muted:#5e5a4e;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);
+  font-family:'Times New Roman',Times,serif;font-size:.93rem;line-height:1.7;
+  overflow-x:hidden;}
+nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.8rem;background:rgba(247,240,226,.97);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.nav-back{display:flex;align-items:center;gap:.45rem;
+  text-decoration:none;color:var(--muted);font-size:.82rem;transition:color .2s;}
+.nav-back:hover{color:var(--text);}
+.nav-title{font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text);font-weight:700;}
+.page-wrap{max-width:1100px;margin:0 auto;padding:5rem 2rem 6rem;}
+h1{font-size:1.4rem;font-weight:bold;color:var(--accent);
+  margin-bottom:1.6rem;padding-bottom:.4rem;border-bottom:2px solid var(--border);}
+/* Code listing */
+.code-listing{margin:2rem 0;border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;background:var(--card);}
+.code-title{display:flex;align-items:baseline;gap:1rem;
+  background:var(--bg2);padding:.6rem 1rem;border-bottom:1px solid var(--border);}
+.lst-num{font-size:.78rem;font-weight:bold;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;}
+.lst-name{font-size:.9rem;font-weight:bold;color:var(--accent);}
+.code-scroll{overflow-x:auto;overflow-y:auto;max-height:600px;
+  resize:vertical;min-height:120px;}
+.code-table{width:100%;border-collapse:collapse;
+  font-family:'Courier New',Courier,monospace;font-size:.78rem;
+  line-height:1.45;background:#fff;}
+.code-table td{padding:.07rem 0;vertical-align:top;white-space:pre;}
+td.ln{user-select:none;color:#999;text-align:right;padding-right:.7rem;
+  padding-left:.5rem;border-right:1px solid var(--border);
+  min-width:3.2rem;background:#f5f5f5;position:sticky;left:0;z-index:1;}
+td.lc{padding-left:.8rem;}
+td.lc code{background:none;font-size:inherit;padding:0;
+  font-family:inherit;white-space:pre;}
+/* Highlight.js theme overrides for inline table */
+.hljs{background:none !important;padding:0 !important;}
+</style>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.code-table').forEach(function(tbl){
+    var lang = tbl.dataset.lang || 'plaintext';
+    tbl.querySelectorAll('td.lc code').forEach(function(cell){
+      cell.className = 'language-' + lang;
+      hljs.highlightElement(cell);
+    });
+  });
+});
+</script>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../thesis.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2.5"
+     stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Thesis
+  </a>
+  <span class="nav-title">Appendix M – Evaluation Data Visualization Python Code</span>
+</nav>
+<div class="page-wrap">
+<h1>Appendix M: Evaluation Data Visualization Python Code</h1>
+<div class="code-listing" id="lst:dutyCycleVisualization">
+  <div class="code-title">
+    <span class="lst-num">Listing M.1</span>
+    <span class="lst-name">t<sub>duty</sub> Evaluation Data Visualization (Python)</span>
+  </div>
+  <div class="code-scroll">
+    <table class="code-table" data-lang="python">
+      <tbody>
+<tr id="lst:dutyCycleVisualization-L1"><td class="ln">1</td><td class="lc"><code>import os</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L2"><td class="ln">2</td><td class="lc"><code>import numpy as np</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L3"><td class="ln">3</td><td class="lc"><code>import matplotlib.pyplot as plt</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L4"><td class="ln">4</td><td class="lc"><code>from natsort import natsorted</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L5"><td class="ln">5</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L6"><td class="ln">6</td><td class="lc"><code>FilesPath = &quot;&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L7"><td class="ln">7</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L8"><td class="ln">8</td><td class="lc"><code>def GetFilesInDir(dirPath: str) -&gt; list:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L9"><td class="ln">9</td><td class="lc"><code>    files = []</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L10"><td class="ln">10</td><td class="lc"><code>    for entry in os.listdir(dirPath):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L11"><td class="ln">11</td><td class="lc"><code>        fullPath = os.path.join(dirPath, entry)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L12"><td class="ln">12</td><td class="lc"><code>        if os.path.isfile(fullPath):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L13"><td class="ln">13</td><td class="lc"><code>            files.append(fullPath)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L14"><td class="ln">14</td><td class="lc"><code>    return natsorted(files)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L15"><td class="ln">15</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L16"><td class="ln">16</td><td class="lc"><code>def ReadDataFromFile(data: dict, filePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L17"><td class="ln">17</td><td class="lc"><code>    print(&quot;reading data from file \&quot;&quot; + filePath + &quot;\&quot;...&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L18"><td class="ln">18</td><td class="lc"><code>    try:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L19"><td class="ln">19</td><td class="lc"><code>        with open(filePath, &quot;r&quot;) as file:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L20"><td class="ln">20</td><td class="lc"><code>            for line in file:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L21"><td class="ln">21</td><td class="lc"><code>                elems = line.split(&quot;|&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L22"><td class="ln">22</td><td class="lc"><code>                if (len(elems) == 7):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L23"><td class="ln">23</td><td class="lc"><code>                    currTargetDuty = int(elems[0])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L24"><td class="ln">24</td><td class="lc"><code>                    if (currTargetDuty not in data):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L25"><td class="ln">25</td><td class="lc"><code>                        data[currTargetDuty] = {}</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L26"><td class="ln">26</td><td class="lc"><code>                    currCircuit = int(elems[1])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L27"><td class="ln">27</td><td class="lc"><code>                    if (currCircuit not in data[currTargetDuty]):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L28"><td class="ln">28</td><td class="lc"><code>                        data[currTargetDuty][currCircuit] = {}</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L29"><td class="ln">29</td><td class="lc"><code>                    currState = int(elems[2])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L30"><td class="ln">30</td><td class="lc"><code>                    if (currState not in data[currTargetDuty][currCircuit]):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L31"><td class="ln">31</td><td class="lc"><code>                        data[currTargetDuty][currCircuit][currState] = {&quot;iters&quot; : [], &quot;timestamps&quot; : [], &quot;dutys&quot; : [], &quot;pauses&quot; : []}</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L32"><td class="ln">32</td><td class="lc"><code>                    currPause = int(elems[3])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L33"><td class="ln">33</td><td class="lc"><code>                    currIter = int(elems[4])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L34"><td class="ln">34</td><td class="lc"><code>                    currTimestamp = int(elems[5])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L35"><td class="ln">35</td><td class="lc"><code>                    currDuty = int(elems[6].replace(&quot;\n&quot;, &quot;&quot;))</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L36"><td class="ln">36</td><td class="lc"><code>                    data[currTargetDuty][currCircuit][currState][&quot;iters&quot;].append(currIter)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L37"><td class="ln">37</td><td class="lc"><code>                    data[currTargetDuty][currCircuit][currState][&quot;timestamps&quot;].append(currTimestamp)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L38"><td class="ln">38</td><td class="lc"><code>                    data[currTargetDuty][currCircuit][currState][&quot;dutys&quot;].append(currDuty)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L39"><td class="ln">39</td><td class="lc"><code>                    data[currTargetDuty][currCircuit][currState][&quot;pauses&quot;].append(currPause)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L40"><td class="ln">40</td><td class="lc"><code>    except Exception as e:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L41"><td class="ln">41</td><td class="lc"><code>        print(&quot;ERROR: Exception when reading file \&quot;&quot; + filePath + &quot;\&quot; (&quot; + str(e) + &quot;)!&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L42"><td class="ln">42</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L43"><td class="ln">43</td><td class="lc"><code>def PlotDutyVsTime(data: dict, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L44"><td class="ln">44</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L45"><td class="ln">45</td><td class="lc"><code>        print(&quot;plotting duty cycle duration vs. time (&quot; + str(targetDuty) + &quot; CPU cycles)...&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L46"><td class="ln">46</td><td class="lc"><code>        circuitNum = len(data[targetDuty])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L47"><td class="ln">47</td><td class="lc"><code>        title = &quot;$t_{duty}$ Duration Error vs. Time&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L48"><td class="ln">48</td><td class="lc"><code>        fig, axes = plt.subplots(nrows = circuitNum, ncols = 2, figsize = (13, 10))</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L49"><td class="ln">49</td><td class="lc"><code>        fig.suptitle(title)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L50"><td class="ln">50</td><td class="lc"><code>        circuitIdx = 0</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L51"><td class="ln">51</td><td class="lc"><code>        for circuit in data[targetDuty]:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L52"><td class="ln">52</td><td class="lc"><code>            for state in data[targetDuty][circuit]:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L53"><td class="ln">53</td><td class="lc"><code>                timestamps = np.array(data[targetDuty][circuit][state][&quot;timestamps&quot;]) / 1000000</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L54"><td class="ln">54</td><td class="lc"><code>                dutys = np.array(data[targetDuty][circuit][state][&quot;dutys&quot;]) - targetDuty</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L55"><td class="ln">55</td><td class="lc"><code>                pauses = np.array(data[targetDuty][circuit][state][&quot;pauses&quot;])</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L56"><td class="ln">56</td><td class="lc"><code>                if (len(dutys) == 0) or (len(timestamps) == 0):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L57"><td class="ln">57</td><td class="lc"><code>                    continue</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L58"><td class="ln">58</td><td class="lc"><code>                dataLabel = &quot;CO &quot; + str(circuit + 1)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L59"><td class="ln">59</td><td class="lc"><code>                if (state == 0):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L60"><td class="ln">60</td><td class="lc"><code>                    dataLabel += &quot;, HIGH $t_{duty}$&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L61"><td class="ln">61</td><td class="lc"><code>                else:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L62"><td class="ln">62</td><td class="lc"><code>                    dataLabel += &quot;, LOW $t_{duty}$&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L63"><td class="ln">63</td><td class="lc"><code>                plots = None</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L64"><td class="ln">64</td><td class="lc"><code>                if (circuitNum == 1):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L65"><td class="ln">65</td><td class="lc"><code>                    plots = axes[state]</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L66"><td class="ln">66</td><td class="lc"><code>                else:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L67"><td class="ln">67</td><td class="lc"><code>                    plots = axes[circuitIdx, state]</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L68"><td class="ln">68</td><td class="lc"><code>                plots.set_title(dataLabel)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L69"><td class="ln">69</td><td class="lc"><code>                for i in range(len(timestamps)):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L70"><td class="ln">70</td><td class="lc"><code>                    if (pauses[i] == 1):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L71"><td class="ln">71</td><td class="lc"><code>                        plots.axvline(x = timestamps[i], color = &quot;r&quot;, linewidth = 5.0, alpha = 0.3)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L72"><td class="ln">72</td><td class="lc"><code>                plots.plot(timestamps, dutys, linewidth = 0.5, label = dataLabel)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L73"><td class="ln">73</td><td class="lc"><code>                plots.axhline(y = -500, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L74"><td class="ln">74</td><td class="lc"><code>                plots.axhline(y = 500, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L75"><td class="ln">75</td><td class="lc"><code>                plots.set_xlim(min(timestamps), max(timestamps))</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L76"><td class="ln">76</td><td class="lc"><code>                plots.set_ylim(-1000, 1000)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L77"><td class="ln">77</td><td class="lc"><code>                plots.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L78"><td class="ln">78</td><td class="lc"><code>            circuitIdx += 1</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L79"><td class="ln">79</td><td class="lc"><code>        fig.supxlabel(&quot;Time (s)&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L80"><td class="ln">80</td><td class="lc"><code>        fig.supylabel(&quot;$t_{duty}$ Error (CPU cycles)&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L81"><td class="ln">81</td><td class="lc"><code>        plt.tight_layout()</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L82"><td class="ln">82</td><td class="lc"><code>        if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L83"><td class="ln">83</td><td class="lc"><code>            fileDirPath = os.path.dirname(savePath) + &quot;\\plots\\duration_v_time\\&quot; + str(targetDuty) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L84"><td class="ln">84</td><td class="lc"><code>            fileName = os.path.basename(savePath).replace(&quot;.txt&quot;, &quot;&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L85"><td class="ln">85</td><td class="lc"><code>            fullSavePath = fileDirPath + fileName + &quot;.png&quot;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L86"><td class="ln">86</td><td class="lc"><code>            os.makedirs(fileDirPath, exist_ok = True)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L87"><td class="ln">87</td><td class="lc"><code>            plt.savefig(fullSavePath)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L88"><td class="ln">88</td><td class="lc"><code>        if (show):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L89"><td class="ln">89</td><td class="lc"><code>            plt.show()</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L90"><td class="ln">90</td><td class="lc"><code>        plt.clf()</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L91"><td class="ln">91</td><td class="lc"><code>        plt.close()</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L92"><td class="ln">92</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L93"><td class="ln">93</td><td class="lc"><code>def main():</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L94"><td class="ln">94</td><td class="lc"><code>    print(&quot;---- SCRIPT STARTED ----\n&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L95"><td class="ln">95</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L96"><td class="ln">96</td><td class="lc"><code>    files = GetFilesInDir(FilesPath)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L97"><td class="ln">97</td><td class="lc"><code>    for filePath in files:</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L98"><td class="ln">98</td><td class="lc"><code>        if (filePath.endswith(&quot;.txt&quot;) or filePath.endswith(&quot;.TXT&quot;)):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L99"><td class="ln">99</td><td class="lc"><code>            currData = {}</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L100"><td class="ln">100</td><td class="lc"><code>            ReadDataFromFile(currData, filePath)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L101"><td class="ln">101</td><td class="lc"><code>            PlotDutyVsTime(currData, True, filePath)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L102"><td class="ln">102</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L103"><td class="ln">103</td><td class="lc"><code>    print(&quot;\n\n---- SCRIPT FINISHED ----&quot;)</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L104"><td class="ln">104</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L105"><td class="ln">105</td><td class="lc"><code>if (__name__ == &quot;__main__&quot;):</code></td></tr>
+<tr id="lst:dutyCycleVisualization-L106"><td class="ln">106</td><td class="lc"><code>    main()</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="code-listing" id="lst:phaseEvaluation">
+  <div class="code-title">
+    <span class="lst-num">Listing M.2</span>
+    <span class="lst-name">∆Φ Evaluation Data Visualization (Python)</span>
+  </div>
+  <div class="code-scroll">
+    <table class="code-table" data-lang="python">
+      <tbody>
+<tr id="lst:phaseEvaluation-L1"><td class="ln">1</td><td class="lc"><code>import os</code></td></tr>
+<tr id="lst:phaseEvaluation-L2"><td class="ln">2</td><td class="lc"><code>import numpy as np</code></td></tr>
+<tr id="lst:phaseEvaluation-L3"><td class="ln">3</td><td class="lc"><code>import matplotlib.pyplot as plt</code></td></tr>
+<tr id="lst:phaseEvaluation-L4"><td class="ln">4</td><td class="lc"><code>from matplotlib.ticker import MultipleLocator</code></td></tr>
+<tr id="lst:phaseEvaluation-L5"><td class="ln">5</td><td class="lc"><code>from mpl_toolkits.axes_grid1 import make_axes_locatable</code></td></tr>
+<tr id="lst:phaseEvaluation-L6"><td class="ln">6</td><td class="lc"><code>from natsort import natsorted</code></td></tr>
+<tr id="lst:phaseEvaluation-L7"><td class="ln">7</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L8"><td class="ln">8</td><td class="lc"><code>FilesPath = &quot;&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L9"><td class="ln">9</td><td class="lc"><code>OperationTypes = {</code></td></tr>
+<tr id="lst:phaseEvaluation-L10"><td class="ln">10</td><td class="lc"><code>    0 : &quot;Storage&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L11"><td class="ln">11</td><td class="lc"><code>    1 : &quot;Copy&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L12"><td class="ln">12</td><td class="lc"><code>    2 : &quot;Inversion&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L13"><td class="ln">13</td><td class="lc"><code>    3 : &quot;Addition&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L14"><td class="ln">14</td><td class="lc"><code>    4 : &quot;Subtraction&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L15"><td class="ln">15</td><td class="lc"><code>}</code></td></tr>
+<tr id="lst:phaseEvaluation-L16"><td class="ln">16</td><td class="lc"><code>TDVPlotColors = {</code></td></tr>
+<tr id="lst:phaseEvaluation-L17"><td class="ln">17</td><td class="lc"><code>    0 : (&quot;blue&quot;, &quot;blue&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L18"><td class="ln">18</td><td class="lc"><code>    1 : (&quot;red&quot;, &quot;red&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L19"><td class="ln">19</td><td class="lc"><code>    2 : (&quot;green&quot;, &quot;green&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L20"><td class="ln">20</td><td class="lc"><code>}</code></td></tr>
+<tr id="lst:phaseEvaluation-L21"><td class="ln">21</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L22"><td class="ln">22</td><td class="lc"><code>def GetFilesInDir(dirPath) -&gt; list[str]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L23"><td class="ln">23</td><td class="lc"><code>    files = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L24"><td class="ln">24</td><td class="lc"><code>    for entry in os.listdir(dirPath):</code></td></tr>
+<tr id="lst:phaseEvaluation-L25"><td class="ln">25</td><td class="lc"><code>        full_path = os.path.join(dirPath, entry)</code></td></tr>
+<tr id="lst:phaseEvaluation-L26"><td class="ln">26</td><td class="lc"><code>        if os.path.isfile(full_path):</code></td></tr>
+<tr id="lst:phaseEvaluation-L27"><td class="ln">27</td><td class="lc"><code>            files.append(full_path)</code></td></tr>
+<tr id="lst:phaseEvaluation-L28"><td class="ln">28</td><td class="lc"><code>    return natsorted(files)</code></td></tr>
+<tr id="lst:phaseEvaluation-L29"><td class="ln">29</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L30"><td class="ln">30</td><td class="lc"><code>def ReadDataFromFile(data: dict, filePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L31"><td class="ln">31</td><td class="lc"><code>    print(&quot;reading data from file \&quot;&quot; + filePath + &quot;\&quot;...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L32"><td class="ln">32</td><td class="lc"><code>    with open(filePath, &quot;r&quot;) as file:</code></td></tr>
+<tr id="lst:phaseEvaluation-L33"><td class="ln">33</td><td class="lc"><code>        for line in file:</code></td></tr>
+<tr id="lst:phaseEvaluation-L34"><td class="ln">34</td><td class="lc"><code>            elems = line.split(&quot;|&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L35"><td class="ln">35</td><td class="lc"><code>            if (len(elems) == 11):</code></td></tr>
+<tr id="lst:phaseEvaluation-L36"><td class="ln">36</td><td class="lc"><code>                currTargetDuty = int(elems[0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L37"><td class="ln">37</td><td class="lc"><code>                if (currTargetDuty not in data):</code></td></tr>
+<tr id="lst:phaseEvaluation-L38"><td class="ln">38</td><td class="lc"><code>                    data[currTargetDuty] = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L39"><td class="ln">39</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L40"><td class="ln">40</td><td class="lc"><code>                currTrackType = int(elems[1])</code></td></tr>
+<tr id="lst:phaseEvaluation-L41"><td class="ln">41</td><td class="lc"><code>                if (currTrackType not in data[currTargetDuty]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L42"><td class="ln">42</td><td class="lc"><code>                    data[currTargetDuty][currTrackType] = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L43"><td class="ln">43</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L44"><td class="ln">44</td><td class="lc"><code>                currTocd = int(elems[2])</code></td></tr>
+<tr id="lst:phaseEvaluation-L45"><td class="ln">45</td><td class="lc"><code>                if (currTocd not in data[currTargetDuty][currTrackType]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L46"><td class="ln">46</td><td class="lc"><code>                    data[currTargetDuty][currTrackType][currTocd] = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L47"><td class="ln">47</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L48"><td class="ln">48</td><td class="lc"><code>                currTrackIdx = int(elems[3])</code></td></tr>
+<tr id="lst:phaseEvaluation-L49"><td class="ln">49</td><td class="lc"><code>                if (currTrackIdx not in data[currTargetDuty][currTrackType][currTocd]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L50"><td class="ln">50</td><td class="lc"><code>                    data[currTargetDuty][currTrackType][currTocd][currTrackIdx] = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L51"><td class="ln">51</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L52"><td class="ln">52</td><td class="lc"><code>                currRunIdx = int(elems[4])</code></td></tr>
+<tr id="lst:phaseEvaluation-L53"><td class="ln">53</td><td class="lc"><code>                if (currRunIdx not in data[currTargetDuty][currTrackType][currTocd][currTrackIdx]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L54"><td class="ln">54</td><td class="lc"><code>                    data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx] = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L55"><td class="ln">55</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L56"><td class="ln">56</td><td class="lc"><code>                currTdv = int(elems[5])</code></td></tr>
+<tr id="lst:phaseEvaluation-L57"><td class="ln">57</td><td class="lc"><code>                currResultStatus = int(elems[6])</code></td></tr>
+<tr id="lst:phaseEvaluation-L58"><td class="ln">58</td><td class="lc"><code>                currTargetPhase = int(elems[7])</code></td></tr>
+<tr id="lst:phaseEvaluation-L59"><td class="ln">59</td><td class="lc"><code>                if (currTdv not in data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L60"><td class="ln">60</td><td class="lc"><code>                    data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx][currTdv] = {&quot;resultStatus&quot; : currResultStatus, &quot;iters&quot; : [], &quot;timestamps&quot; : [], &quot;targetPhase&quot; : currTargetPhase, &quot;phases&quot; : []}</code></td></tr>
+<tr id="lst:phaseEvaluation-L61"><td class="ln">61</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L62"><td class="ln">62</td><td class="lc"><code>                currIter = int(elems[8])</code></td></tr>
+<tr id="lst:phaseEvaluation-L63"><td class="ln">63</td><td class="lc"><code>                currTimestamp = int(elems[9])</code></td></tr>
+<tr id="lst:phaseEvaluation-L64"><td class="ln">64</td><td class="lc"><code>                currPhase = int(elems[10].replace(&quot;\n&quot;, &quot;&quot;))</code></td></tr>
+<tr id="lst:phaseEvaluation-L65"><td class="ln">65</td><td class="lc"><code>                data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx][currTdv][&quot;iters&quot;].append(currIter)</code></td></tr>
+<tr id="lst:phaseEvaluation-L66"><td class="ln">66</td><td class="lc"><code>                data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx][currTdv][&quot;timestamps&quot;].append(currTimestamp)</code></td></tr>
+<tr id="lst:phaseEvaluation-L67"><td class="ln">67</td><td class="lc"><code>                data[currTargetDuty][currTrackType][currTocd][currTrackIdx][currRunIdx][currTdv][&quot;phases&quot;].append(currPhase)</code></td></tr>
+<tr id="lst:phaseEvaluation-L68"><td class="ln">68</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L69"><td class="ln">69</td><td class="lc"><code>def GetTDVOperationName(operation: int, type: int) -&gt; str:</code></td></tr>
+<tr id="lst:phaseEvaluation-L70"><td class="ln">70</td><td class="lc"><code>    if (operation == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L71"><td class="ln">71</td><td class="lc"><code>        return &quot;ΔΦ&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L72"><td class="ln">72</td><td class="lc"><code>    elif (operation == 1) or (operation == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L73"><td class="ln">73</td><td class="lc"><code>        if (type == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L74"><td class="ln">74</td><td class="lc"><code>            return &quot;ΔΦ$_{O}$&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L75"><td class="ln">75</td><td class="lc"><code>        elif (type == 1):</code></td></tr>
+<tr id="lst:phaseEvaluation-L76"><td class="ln">76</td><td class="lc"><code>            return &quot;ΔΦ$_{R}$&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L77"><td class="ln">77</td><td class="lc"><code>    if (type == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L78"><td class="ln">78</td><td class="lc"><code>        return &quot;ΔΦ$_{O1}$&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L79"><td class="ln">79</td><td class="lc"><code>    elif (type == 1):</code></td></tr>
+<tr id="lst:phaseEvaluation-L80"><td class="ln">80</td><td class="lc"><code>        return &quot;ΔΦ$_{O2}$&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L81"><td class="ln">81</td><td class="lc"><code>    elif (type == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L82"><td class="ln">82</td><td class="lc"><code>        return &quot;ΔΦ$_{R}$&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L83"><td class="ln">83</td><td class="lc"><code>    return &quot;INVALID&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L84"><td class="ln">84</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L85"><td class="ln">85</td><td class="lc"><code>def GetPhaseDiffCorrectNum(phaseDiffData: list[int], operatingCycles: int, tolerance: float) -&gt; int:</code></td></tr>
+<tr id="lst:phaseEvaluation-L86"><td class="ln">86</td><td class="lc"><code>    correctNum = 0</code></td></tr>
+<tr id="lst:phaseEvaluation-L87"><td class="ln">87</td><td class="lc"><code>    for phaseDiff in phaseDiffData:</code></td></tr>
+<tr id="lst:phaseEvaluation-L88"><td class="ln">88</td><td class="lc"><code>        if (abs(phaseDiff) &lt;= round(operatingCycles * tolerance)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L89"><td class="ln">89</td><td class="lc"><code>            correctNum += 1</code></td></tr>
+<tr id="lst:phaseEvaluation-L90"><td class="ln">90</td><td class="lc"><code>    return correctNum</code></td></tr>
+<tr id="lst:phaseEvaluation-L91"><td class="ln">91</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L92"><td class="ln">92</td><td class="lc"><code>def PlotValuesVsTimePerTestRunResult(data: dict, timeLimit: float, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L93"><td class="ln">93</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L94"><td class="ln">94</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L95"><td class="ln">95</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L96"><td class="ln">96</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L97"><td class="ln">97</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L98"><td class="ln">98</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L99"><td class="ln">99</td><td class="lc"><code>                        print(&quot;plotting TDV values vs. time for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;, &quot; + str(tocd) + &quot;, &quot; + str(testIdx) + &quot;, &quot; + str(runIdx) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L100"><td class="ln">100</td><td class="lc"><code>                        fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (8, 6), dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L101"><td class="ln">101</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L102"><td class="ln">102</td><td class="lc"><code>                            resultStatus = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;resultStatus&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L103"><td class="ln">103</td><td class="lc"><code>                            if (resultStatus != 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L104"><td class="ln">104</td><td class="lc"><code>                                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L105"><td class="ln">105</td><td class="lc"><code>                            timeData = np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;timestamps&quot;]) / 1000000</code></td></tr>
+<tr id="lst:phaseEvaluation-L106"><td class="ln">106</td><td class="lc"><code>                            phaseData = (np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;]) / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L107"><td class="ln">107</td><td class="lc"><code>                            targetPhase = (data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;] / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L108"><td class="ln">108</td><td class="lc"><code>                            axPlot = axes</code></td></tr>
+<tr id="lst:phaseEvaluation-L109"><td class="ln">109</td><td class="lc"><code>                            axPlot.plot(timeData, phaseData, c = TDVPlotColors[tdv][0], linewidth = 2, label = &quot;Result TDV&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L110"><td class="ln">110</td><td class="lc"><code>                            axPlot.axhline(y = targetPhase, color = TDVPlotColors[tdv][1], linewidth = 2, alpha = 0.5, linestyle = &quot;dashed&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L111"><td class="ln">111</td><td class="lc"><code>                            axPlot.set_xlim(0, timeLimit)</code></td></tr>
+<tr id="lst:phaseEvaluation-L112"><td class="ln">112</td><td class="lc"><code>                            axPlot.set_ylim(0, 180)</code></td></tr>
+<tr id="lst:phaseEvaluation-L113"><td class="ln">113</td><td class="lc"><code>                            axPlot.xaxis.set_major_locator(MultipleLocator(timeLimit / 10))</code></td></tr>
+<tr id="lst:phaseEvaluation-L114"><td class="ln">114</td><td class="lc"><code>                            axPlot.yaxis.set_major_locator(MultipleLocator(45))</code></td></tr>
+<tr id="lst:phaseEvaluation-L115"><td class="ln">115</td><td class="lc"><code>                            axPlot.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L116"><td class="ln">116</td><td class="lc"><code>                            finalPhaseIdx = 0</code></td></tr>
+<tr id="lst:phaseEvaluation-L117"><td class="ln">117</td><td class="lc"><code>                            for i in range(len(timeData)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L118"><td class="ln">118</td><td class="lc"><code>                                if (timeData[i] &gt;= timeLimit):</code></td></tr>
+<tr id="lst:phaseEvaluation-L119"><td class="ln">119</td><td class="lc"><code>                                    finalPhaseIdx = i</code></td></tr>
+<tr id="lst:phaseEvaluation-L120"><td class="ln">120</td><td class="lc"><code>                                    break</code></td></tr>
+<tr id="lst:phaseEvaluation-L121"><td class="ln">121</td><td class="lc"><code>                            finalPhase = phaseData[finalPhaseIdx]</code></td></tr>
+<tr id="lst:phaseEvaluation-L122"><td class="ln">122</td><td class="lc"><code>                            if (finalPhase &lt;= 180) and (finalPhase &gt;= 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L123"><td class="ln">123</td><td class="lc"><code>                                finalPhaseStr = str(round(finalPhase)) + &quot;°&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L124"><td class="ln">124</td><td class="lc"><code>                                for i in range(max(0, 4 - len(finalPhaseStr))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L125"><td class="ln">125</td><td class="lc"><code>                                    finalPhaseStr += &quot;  &quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L126"><td class="ln">126</td><td class="lc"><code>                                axPlot.annotate(finalPhaseStr, </code></td></tr>
+<tr id="lst:phaseEvaluation-L127"><td class="ln">127</td><td class="lc"><code>                                                xy = (timeLimit, finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L128"><td class="ln">128</td><td class="lc"><code>                                                xytext = (timeLimit + (timeLimit * 0.02), finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L129"><td class="ln">129</td><td class="lc"><code>                                                xycoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L130"><td class="ln">130</td><td class="lc"><code>                                                textcoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L131"><td class="ln">131</td><td class="lc"><code>                                                ha = &quot;left&quot;, </code></td></tr>
+<tr id="lst:phaseEvaluation-L132"><td class="ln">132</td><td class="lc"><code>                                                va = &quot;center&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L133"><td class="ln">133</td><td class="lc"><code>                                                arrowprops = dict(color = TDVPlotColors[tdv][0], arrowstyle = &quot;-&gt;&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L134"><td class="ln">134</td><td class="lc"><code>                                                annotation_clip = False,</code></td></tr>
+<tr id="lst:phaseEvaluation-L135"><td class="ln">135</td><td class="lc"><code>                                                color = TDVPlotColors[tdv][0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L136"><td class="ln">136</td><td class="lc"><code>                            axPlot.set_title(GetTDVOperationName(testType, tdv) + &quot; target = &quot; + str(round(targetPhase)) + &quot;°&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L137"><td class="ln">137</td><td class="lc"><code>                        if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L138"><td class="ln">138</td><td class="lc"><code>                            fig.suptitle(&quot;TDV ΔΦ vs. Time (&quot; + operation + &quot;, Test: &quot; + str(testIdx) + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L139"><td class="ln">139</td><td class="lc"><code>                        else:</code></td></tr>
+<tr id="lst:phaseEvaluation-L140"><td class="ln">140</td><td class="lc"><code>                            fig.suptitle(&quot;TDV ΔΦ vs. Time (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs, Test: &quot; + str(testIdx) + &quot;, Run: &quot; + str(runIdx) + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L141"><td class="ln">141</td><td class="lc"><code>                        fig.supxlabel(&quot;Time (s)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L142"><td class="ln">142</td><td class="lc"><code>                        fig.supylabel(&quot;ΔΦ (°)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L143"><td class="ln">143</td><td class="lc"><code>                        handles, labels = axes.get_legend_handles_labels()</code></td></tr>
+<tr id="lst:phaseEvaluation-L144"><td class="ln">144</td><td class="lc"><code>                        fig.legend(handles, labels, ncols = 1, loc = &quot;lower left&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L145"><td class="ln">145</td><td class="lc"><code>                        plt.tight_layout()</code></td></tr>
+<tr id="lst:phaseEvaluation-L146"><td class="ln">146</td><td class="lc"><code>                        if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L147"><td class="ln">147</td><td class="lc"><code>                            plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L148"><td class="ln">148</td><td class="lc"><code>                        if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L149"><td class="ln">149</td><td class="lc"><code>                            fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\tocd_&quot; + str(tocd) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L150"><td class="ln">150</td><td class="lc"><code>                            os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L151"><td class="ln">151</td><td class="lc"><code>                            plt.savefig(fullSavePath + &quot;val_vs_time_test_&quot; + str(testIdx) + &quot;_run_&quot; + str(runIdx) + &quot;.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L152"><td class="ln">152</td><td class="lc"><code>                        plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L153"><td class="ln">153</td><td class="lc"><code>                        plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L154"><td class="ln">154</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L155"><td class="ln">155</td><td class="lc"><code>def PlotValuesVsTimePerTestRunAll(data: dict, timeLimit: float, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L156"><td class="ln">156</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L157"><td class="ln">157</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L158"><td class="ln">158</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L159"><td class="ln">159</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L160"><td class="ln">160</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L161"><td class="ln">161</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L162"><td class="ln">162</td><td class="lc"><code>                        print(&quot;plotting TDV values vs. time for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;, &quot; + str(tocd) + &quot;, &quot; + str(testIdx) + &quot;, &quot; + str(runIdx) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L163"><td class="ln">163</td><td class="lc"><code>                        plotNum = 3</code></td></tr>
+<tr id="lst:phaseEvaluation-L164"><td class="ln">164</td><td class="lc"><code>                        if (testType == 1) or (testType == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L165"><td class="ln">165</td><td class="lc"><code>                            plotNum = 2</code></td></tr>
+<tr id="lst:phaseEvaluation-L166"><td class="ln">166</td><td class="lc"><code>                        fig, axes = plt.subplots(nrows = plotNum, ncols = 1, figsize = (8, 6), dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L167"><td class="ln">167</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L168"><td class="ln">168</td><td class="lc"><code>                            if (tdv &gt;= plotNum):</code></td></tr>
+<tr id="lst:phaseEvaluation-L169"><td class="ln">169</td><td class="lc"><code>                                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L170"><td class="ln">170</td><td class="lc"><code>                            timeData = np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;timestamps&quot;]) / 1000000</code></td></tr>
+<tr id="lst:phaseEvaluation-L171"><td class="ln">171</td><td class="lc"><code>                            phaseData = (np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;]) / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L172"><td class="ln">172</td><td class="lc"><code>                            targetPhase = (data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;] / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L173"><td class="ln">173</td><td class="lc"><code>                            axPlot = axes[tdv]</code></td></tr>
+<tr id="lst:phaseEvaluation-L174"><td class="ln">174</td><td class="lc"><code>                            axPlot.plot(timeData, phaseData, c = TDVPlotColors[tdv][0], linewidth = 2, label = &quot;TDV #&quot; + str(tdv + 1))</code></td></tr>
+<tr id="lst:phaseEvaluation-L175"><td class="ln">175</td><td class="lc"><code>                            axPlot.axhline(y = targetPhase, color = TDVPlotColors[tdv][1], linewidth = 2, alpha = 0.5, linestyle = &quot;dashed&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L176"><td class="ln">176</td><td class="lc"><code>                            axPlot.set_xlim(0, timeLimit)</code></td></tr>
+<tr id="lst:phaseEvaluation-L177"><td class="ln">177</td><td class="lc"><code>                            axPlot.set_ylim(0, 180)</code></td></tr>
+<tr id="lst:phaseEvaluation-L178"><td class="ln">178</td><td class="lc"><code>                            axPlot.xaxis.set_major_locator(MultipleLocator(timeLimit / 10))</code></td></tr>
+<tr id="lst:phaseEvaluation-L179"><td class="ln">179</td><td class="lc"><code>                            axPlot.yaxis.set_major_locator(MultipleLocator(45))</code></td></tr>
+<tr id="lst:phaseEvaluation-L180"><td class="ln">180</td><td class="lc"><code>                            axPlot.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L181"><td class="ln">181</td><td class="lc"><code>                            finalPhaseIdx = 0</code></td></tr>
+<tr id="lst:phaseEvaluation-L182"><td class="ln">182</td><td class="lc"><code>                            for i in range(len(timeData)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L183"><td class="ln">183</td><td class="lc"><code>                                if (timeData[i] &gt;= timeLimit):</code></td></tr>
+<tr id="lst:phaseEvaluation-L184"><td class="ln">184</td><td class="lc"><code>                                    finalPhaseIdx = i</code></td></tr>
+<tr id="lst:phaseEvaluation-L185"><td class="ln">185</td><td class="lc"><code>                                    break</code></td></tr>
+<tr id="lst:phaseEvaluation-L186"><td class="ln">186</td><td class="lc"><code>                            finalPhase = phaseData[finalPhaseIdx]</code></td></tr>
+<tr id="lst:phaseEvaluation-L187"><td class="ln">187</td><td class="lc"><code>                            if (finalPhase &lt;= 180) and (finalPhase &gt;= 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L188"><td class="ln">188</td><td class="lc"><code>                                finalPhaseStr = str(round(finalPhase)) + &quot;°&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L189"><td class="ln">189</td><td class="lc"><code>                                for i in range(max(0, 4 - len(finalPhaseStr))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L190"><td class="ln">190</td><td class="lc"><code>                                    finalPhaseStr += &quot;  &quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L191"><td class="ln">191</td><td class="lc"><code>                                axPlot.annotate(finalPhaseStr, </code></td></tr>
+<tr id="lst:phaseEvaluation-L192"><td class="ln">192</td><td class="lc"><code>                                                xy = (timeLimit, finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L193"><td class="ln">193</td><td class="lc"><code>                                                xytext = (timeLimit + (timeLimit * 0.02), finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L194"><td class="ln">194</td><td class="lc"><code>                                                xycoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L195"><td class="ln">195</td><td class="lc"><code>                                                textcoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L196"><td class="ln">196</td><td class="lc"><code>                                                ha = &quot;left&quot;, </code></td></tr>
+<tr id="lst:phaseEvaluation-L197"><td class="ln">197</td><td class="lc"><code>                                                va = &quot;center&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L198"><td class="ln">198</td><td class="lc"><code>                                                arrowprops = dict(color = TDVPlotColors[tdv][0], arrowstyle = &quot;-&gt;&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L199"><td class="ln">199</td><td class="lc"><code>                                                annotation_clip = False,</code></td></tr>
+<tr id="lst:phaseEvaluation-L200"><td class="ln">200</td><td class="lc"><code>                                                color = TDVPlotColors[tdv][0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L201"><td class="ln">201</td><td class="lc"><code>                            axPlot.set_title(GetTDVOperationName(testType, tdv) + &quot; target = &quot; + str(round(targetPhase)) + &quot;°&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L202"><td class="ln">202</td><td class="lc"><code>                        if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L203"><td class="ln">203</td><td class="lc"><code>                            fig.suptitle(&quot;TDV ΔΦ vs. Time (&quot; + operation + &quot;, Test: &quot; + str(testIdx) + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L204"><td class="ln">204</td><td class="lc"><code>                        else:</code></td></tr>
+<tr id="lst:phaseEvaluation-L205"><td class="ln">205</td><td class="lc"><code>                            fig.suptitle(&quot;TDV ΔΦ vs. Time (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs, Test: &quot; + str(testIdx) + &quot;, Run: &quot; + str(runIdx) + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L206"><td class="ln">206</td><td class="lc"><code>                        fig.supxlabel(&quot;Time (s)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L207"><td class="ln">207</td><td class="lc"><code>                        fig.supylabel(&quot;ΔΦ (°)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L208"><td class="ln">208</td><td class="lc"><code>                        handles, labels = [], []</code></td></tr>
+<tr id="lst:phaseEvaluation-L209"><td class="ln">209</td><td class="lc"><code>                        for ax in axes.flatten():</code></td></tr>
+<tr id="lst:phaseEvaluation-L210"><td class="ln">210</td><td class="lc"><code>                            h, l = ax.get_legend_handles_labels()</code></td></tr>
+<tr id="lst:phaseEvaluation-L211"><td class="ln">211</td><td class="lc"><code>                            handles += h</code></td></tr>
+<tr id="lst:phaseEvaluation-L212"><td class="ln">212</td><td class="lc"><code>                            labels += l</code></td></tr>
+<tr id="lst:phaseEvaluation-L213"><td class="ln">213</td><td class="lc"><code>                        fig.legend(handles, labels, ncols = 3, loc = &quot;lower left&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L214"><td class="ln">214</td><td class="lc"><code>                        plt.tight_layout()</code></td></tr>
+<tr id="lst:phaseEvaluation-L215"><td class="ln">215</td><td class="lc"><code>                        if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L216"><td class="ln">216</td><td class="lc"><code>                            plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L217"><td class="ln">217</td><td class="lc"><code>                        if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L218"><td class="ln">218</td><td class="lc"><code>                            fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\tocd_&quot; + str(tocd) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L219"><td class="ln">219</td><td class="lc"><code>                            os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L220"><td class="ln">220</td><td class="lc"><code>                            plt.savefig(fullSavePath + &quot;val_vs_time_test_&quot; + str(testIdx) + &quot;_run_&quot; + str(runIdx) + &quot;.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L221"><td class="ln">221</td><td class="lc"><code>                        plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L222"><td class="ln">222</td><td class="lc"><code>                        plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L223"><td class="ln">223</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L224"><td class="ln">224</td><td class="lc"><code>def PlotErrorVsTimePerOperationResult(data: dict, tolerance: float, timeLimit: float, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L225"><td class="ln">225</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L226"><td class="ln">226</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L227"><td class="ln">227</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L228"><td class="ln">228</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L229"><td class="ln">229</td><td class="lc"><code>                print(&quot;plotting TDV error vs. time for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;, &quot; + str(tocd) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L230"><td class="ln">230</td><td class="lc"><code>                plotData = {0 : {}, 1 : {}, 2 : {}}</code></td></tr>
+<tr id="lst:phaseEvaluation-L231"><td class="ln">231</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L232"><td class="ln">232</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L233"><td class="ln">233</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L234"><td class="ln">234</td><td class="lc"><code>                            resultStatus = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;resultStatus&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L235"><td class="ln">235</td><td class="lc"><code>                            if (resultStatus != 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L236"><td class="ln">236</td><td class="lc"><code>                                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L237"><td class="ln">237</td><td class="lc"><code>                            if (len(plotData[tdv]) == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L238"><td class="ln">238</td><td class="lc"><code>                                plotData[tdv] = {&quot;iters&quot; : [], &quot;timestamps&quot; : [], &quot;phaseDiffs&quot; : []}</code></td></tr>
+<tr id="lst:phaseEvaluation-L239"><td class="ln">239</td><td class="lc"><code>                            for i in range(len(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L240"><td class="ln">240</td><td class="lc"><code>                                if (i &gt;= len(plotData[tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L241"><td class="ln">241</td><td class="lc"><code>                                    plotData[tdv][&quot;iters&quot;].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;iters&quot;][i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L242"><td class="ln">242</td><td class="lc"><code>                                    plotData[tdv][&quot;timestamps&quot;].append([])</code></td></tr>
+<tr id="lst:phaseEvaluation-L243"><td class="ln">243</td><td class="lc"><code>                                    plotData[tdv][&quot;phaseDiffs&quot;].append([])</code></td></tr>
+<tr id="lst:phaseEvaluation-L244"><td class="ln">244</td><td class="lc"><code>                                plotData[tdv][&quot;timestamps&quot;][i].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;timestamps&quot;][i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L245"><td class="ln">245</td><td class="lc"><code>                                plotData[tdv][&quot;phaseDiffs&quot;][i].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;][i] - data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;])</code></td></tr>
+<tr id="lst:phaseEvaluation-L246"><td class="ln">246</td><td class="lc"><code>                fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (8, 6), dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L247"><td class="ln">247</td><td class="lc"><code>                for tdv in plotData:</code></td></tr>
+<tr id="lst:phaseEvaluation-L248"><td class="ln">248</td><td class="lc"><code>                    axPlot = axes</code></td></tr>
+<tr id="lst:phaseEvaluation-L249"><td class="ln">249</td><td class="lc"><code>                    if (len(plotData[tdv]) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L250"><td class="ln">250</td><td class="lc"><code>                        timeData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L251"><td class="ln">251</td><td class="lc"><code>                        phaseDiffMeanData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L252"><td class="ln">252</td><td class="lc"><code>                        phaseDiffDevData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L253"><td class="ln">253</td><td class="lc"><code>                        for i in range(len(plotData[tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L254"><td class="ln">254</td><td class="lc"><code>                            timeData.append(np.mean(plotData[tdv][&quot;timestamps&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L255"><td class="ln">255</td><td class="lc"><code>                            phaseDiffMeanData.append(np.mean(plotData[tdv][&quot;phaseDiffs&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L256"><td class="ln">256</td><td class="lc"><code>                            phaseDiffDevData.append(np.std(plotData[tdv][&quot;phaseDiffs&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L257"><td class="ln">257</td><td class="lc"><code>                        timeData = np.array(timeData) / 1000000</code></td></tr>
+<tr id="lst:phaseEvaluation-L258"><td class="ln">258</td><td class="lc"><code>                        phaseDiffMeanData = (np.array(phaseDiffMeanData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L259"><td class="ln">259</td><td class="lc"><code>                        phaseDiffDevData = (np.array(phaseDiffDevData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L260"><td class="ln">260</td><td class="lc"><code>                        axPlot.plot(timeData, phaseDiffMeanData, c = TDVPlotColors[tdv][0], linewidth = 2, label = &quot;Result TDV&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L261"><td class="ln">261</td><td class="lc"><code>                        axPlot.fill_between(timeData, phaseDiffMeanData - phaseDiffDevData, phaseDiffMeanData + phaseDiffDevData, color = TDVPlotColors[tdv][1], alpha = 0.2)</code></td></tr>
+<tr id="lst:phaseEvaluation-L262"><td class="ln">262</td><td class="lc"><code>                        finalPhaseIdx = 0</code></td></tr>
+<tr id="lst:phaseEvaluation-L263"><td class="ln">263</td><td class="lc"><code>                        for i in range(len(timeData)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L264"><td class="ln">264</td><td class="lc"><code>                            if (timeData[i] &gt;= timeLimit):</code></td></tr>
+<tr id="lst:phaseEvaluation-L265"><td class="ln">265</td><td class="lc"><code>                                finalPhaseIdx = i</code></td></tr>
+<tr id="lst:phaseEvaluation-L266"><td class="ln">266</td><td class="lc"><code>                                break</code></td></tr>
+<tr id="lst:phaseEvaluation-L267"><td class="ln">267</td><td class="lc"><code>                        finalPhase = phaseDiffMeanData[finalPhaseIdx]</code></td></tr>
+<tr id="lst:phaseEvaluation-L268"><td class="ln">268</td><td class="lc"><code>                        if (finalPhase &lt;= 40) and (finalPhase &gt;= -40):</code></td></tr>
+<tr id="lst:phaseEvaluation-L269"><td class="ln">269</td><td class="lc"><code>                            finalPhaseStr = str(round(finalPhase)) + &quot;%&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L270"><td class="ln">270</td><td class="lc"><code>                            for i in range(max(0, 4 - len(finalPhaseStr))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L271"><td class="ln">271</td><td class="lc"><code>                                finalPhaseStr += &quot;  &quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L272"><td class="ln">272</td><td class="lc"><code>                            axPlot.annotate(finalPhaseStr, </code></td></tr>
+<tr id="lst:phaseEvaluation-L273"><td class="ln">273</td><td class="lc"><code>                                            xy = (timeLimit, finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L274"><td class="ln">274</td><td class="lc"><code>                                            xytext = (timeLimit + (timeLimit * 0.02), finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L275"><td class="ln">275</td><td class="lc"><code>                                            xycoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L276"><td class="ln">276</td><td class="lc"><code>                                            textcoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L277"><td class="ln">277</td><td class="lc"><code>                                            ha = &quot;left&quot;, </code></td></tr>
+<tr id="lst:phaseEvaluation-L278"><td class="ln">278</td><td class="lc"><code>                                            va = &quot;center&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L279"><td class="ln">279</td><td class="lc"><code>                                            arrowprops = dict(color = TDVPlotColors[tdv][0], arrowstyle = &quot;-&gt;&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L280"><td class="ln">280</td><td class="lc"><code>                                            annotation_clip = False,</code></td></tr>
+<tr id="lst:phaseEvaluation-L281"><td class="ln">281</td><td class="lc"><code>                                            color = TDVPlotColors[tdv][0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L282"><td class="ln">282</td><td class="lc"><code>                    axPlot.axhline(y = 0, color = TDVPlotColors[tdv][1], linewidth = 2, alpha = 0.5, linestyle = &quot;dashed&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L283"><td class="ln">283</td><td class="lc"><code>                    axPlot.axhline(y = tolerance * 100, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L284"><td class="ln">284</td><td class="lc"><code>                    axPlot.axhline(y = -tolerance * 100, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L285"><td class="ln">285</td><td class="lc"><code>                    axPlot.set_xlim([0, timeLimit])</code></td></tr>
+<tr id="lst:phaseEvaluation-L286"><td class="ln">286</td><td class="lc"><code>                    axPlot.set_ylim(-100, 100)</code></td></tr>
+<tr id="lst:phaseEvaluation-L287"><td class="ln">287</td><td class="lc"><code>                    axPlot.xaxis.set_major_locator(MultipleLocator(timeLimit / 10))</code></td></tr>
+<tr id="lst:phaseEvaluation-L288"><td class="ln">288</td><td class="lc"><code>                    axPlot.yaxis.set_major_locator(MultipleLocator(20))</code></td></tr>
+<tr id="lst:phaseEvaluation-L289"><td class="ln">289</td><td class="lc"><code>                    axPlot.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L290"><td class="ln">290</td><td class="lc"><code>                    if (testType != 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L291"><td class="ln">291</td><td class="lc"><code>                        axPlot.set_title(GetTDVOperationName(testType, tdv), fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L292"><td class="ln">292</td><td class="lc"><code>                if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L293"><td class="ln">293</td><td class="lc"><code>                    fig.suptitle(&quot;TDV ΔΦ Error vs. Time (&quot; + operation + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L294"><td class="ln">294</td><td class="lc"><code>                else:</code></td></tr>
+<tr id="lst:phaseEvaluation-L295"><td class="ln">295</td><td class="lc"><code>                    fig.suptitle(&quot;TDV ΔΦ Error vs. Time (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L296"><td class="ln">296</td><td class="lc"><code>                fig.supxlabel(&quot;Time (s)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L297"><td class="ln">297</td><td class="lc"><code>                fig.supylabel(&quot;ΔΦ Error (%)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L298"><td class="ln">298</td><td class="lc"><code>                handles, labels = axes.get_legend_handles_labels()</code></td></tr>
+<tr id="lst:phaseEvaluation-L299"><td class="ln">299</td><td class="lc"><code>                fig.legend(handles, labels, ncols = 1, loc = &quot;lower left&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L300"><td class="ln">300</td><td class="lc"><code>                plt.tight_layout()</code></td></tr>
+<tr id="lst:phaseEvaluation-L301"><td class="ln">301</td><td class="lc"><code>                if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L302"><td class="ln">302</td><td class="lc"><code>                    plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L303"><td class="ln">303</td><td class="lc"><code>                if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L304"><td class="ln">304</td><td class="lc"><code>                    fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\tocd_&quot; + str(tocd) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L305"><td class="ln">305</td><td class="lc"><code>                    os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L306"><td class="ln">306</td><td class="lc"><code>                    plt.savefig(fullSavePath + &quot;error_v_time.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L307"><td class="ln">307</td><td class="lc"><code>                plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L308"><td class="ln">308</td><td class="lc"><code>                plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L309"><td class="ln">309</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L310"><td class="ln">310</td><td class="lc"><code>def PlotErrorVsTimePerOperationAll(data: dict, tolerance: float, timeLimit: float, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L311"><td class="ln">311</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L312"><td class="ln">312</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L313"><td class="ln">313</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L314"><td class="ln">314</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L315"><td class="ln">315</td><td class="lc"><code>                print(&quot;plotting TDV error vs. time for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;, &quot; + str(tocd) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L316"><td class="ln">316</td><td class="lc"><code>                plotNum = 3</code></td></tr>
+<tr id="lst:phaseEvaluation-L317"><td class="ln">317</td><td class="lc"><code>                if (testType == 1) or (testType == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L318"><td class="ln">318</td><td class="lc"><code>                    plotNum = 2</code></td></tr>
+<tr id="lst:phaseEvaluation-L319"><td class="ln">319</td><td class="lc"><code>                plotData = {0 : {}, 1 : {}, 2 : {}}</code></td></tr>
+<tr id="lst:phaseEvaluation-L320"><td class="ln">320</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L321"><td class="ln">321</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L322"><td class="ln">322</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L323"><td class="ln">323</td><td class="lc"><code>                            if (len(plotData[tdv]) == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L324"><td class="ln">324</td><td class="lc"><code>                                plotData[tdv] = {&quot;iters&quot; : [], &quot;timestamps&quot; : [], &quot;phaseDiffs&quot; : []}</code></td></tr>
+<tr id="lst:phaseEvaluation-L325"><td class="ln">325</td><td class="lc"><code>                            for i in range(len(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L326"><td class="ln">326</td><td class="lc"><code>                                if (i &gt;= len(plotData[tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L327"><td class="ln">327</td><td class="lc"><code>                                    plotData[tdv][&quot;iters&quot;].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;iters&quot;][i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L328"><td class="ln">328</td><td class="lc"><code>                                    plotData[tdv][&quot;timestamps&quot;].append([])</code></td></tr>
+<tr id="lst:phaseEvaluation-L329"><td class="ln">329</td><td class="lc"><code>                                    plotData[tdv][&quot;phaseDiffs&quot;].append([])</code></td></tr>
+<tr id="lst:phaseEvaluation-L330"><td class="ln">330</td><td class="lc"><code>                                plotData[tdv][&quot;timestamps&quot;][i].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;timestamps&quot;][i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L331"><td class="ln">331</td><td class="lc"><code>                                plotData[tdv][&quot;phaseDiffs&quot;][i].append(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;][i] - data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;])</code></td></tr>
+<tr id="lst:phaseEvaluation-L332"><td class="ln">332</td><td class="lc"><code>                fig, axes = plt.subplots(nrows = plotNum, ncols = 1, figsize = (8, 6), dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L333"><td class="ln">333</td><td class="lc"><code>                for tdv in plotData:</code></td></tr>
+<tr id="lst:phaseEvaluation-L334"><td class="ln">334</td><td class="lc"><code>                    if (tdv &gt;= plotNum):</code></td></tr>
+<tr id="lst:phaseEvaluation-L335"><td class="ln">335</td><td class="lc"><code>                        continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L336"><td class="ln">336</td><td class="lc"><code>                    axPlot = axes[tdv]</code></td></tr>
+<tr id="lst:phaseEvaluation-L337"><td class="ln">337</td><td class="lc"><code>                    if (len(plotData[tdv]) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L338"><td class="ln">338</td><td class="lc"><code>                        timeData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L339"><td class="ln">339</td><td class="lc"><code>                        phaseDiffMeanData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L340"><td class="ln">340</td><td class="lc"><code>                        phaseDiffDevData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L341"><td class="ln">341</td><td class="lc"><code>                        for i in range(len(plotData[tdv][&quot;iters&quot;])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L342"><td class="ln">342</td><td class="lc"><code>                            timeData.append(np.mean(plotData[tdv][&quot;timestamps&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L343"><td class="ln">343</td><td class="lc"><code>                            phaseDiffMeanData.append(np.mean(plotData[tdv][&quot;phaseDiffs&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L344"><td class="ln">344</td><td class="lc"><code>                            phaseDiffDevData.append(np.std(plotData[tdv][&quot;phaseDiffs&quot;][i]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L345"><td class="ln">345</td><td class="lc"><code>                        timeData = np.array(timeData) / 1000000</code></td></tr>
+<tr id="lst:phaseEvaluation-L346"><td class="ln">346</td><td class="lc"><code>                        phaseDiffMeanData = (np.array(phaseDiffMeanData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L347"><td class="ln">347</td><td class="lc"><code>                        phaseDiffDevData = (np.array(phaseDiffDevData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L348"><td class="ln">348</td><td class="lc"><code>                        axPlot.plot(timeData, phaseDiffMeanData, c = TDVPlotColors[tdv][0], linewidth = 2, label = &quot;TDV #&quot; + str(tdv + 1))</code></td></tr>
+<tr id="lst:phaseEvaluation-L349"><td class="ln">349</td><td class="lc"><code>                        axPlot.fill_between(timeData, phaseDiffMeanData - phaseDiffDevData, phaseDiffMeanData + phaseDiffDevData, color = TDVPlotColors[tdv][1], alpha = 0.2)</code></td></tr>
+<tr id="lst:phaseEvaluation-L350"><td class="ln">350</td><td class="lc"><code>                        finalPhaseIdx = 0</code></td></tr>
+<tr id="lst:phaseEvaluation-L351"><td class="ln">351</td><td class="lc"><code>                        for i in range(len(timeData)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L352"><td class="ln">352</td><td class="lc"><code>                            if (timeData[i] &gt;= timeLimit):</code></td></tr>
+<tr id="lst:phaseEvaluation-L353"><td class="ln">353</td><td class="lc"><code>                                finalPhaseIdx = i</code></td></tr>
+<tr id="lst:phaseEvaluation-L354"><td class="ln">354</td><td class="lc"><code>                                break</code></td></tr>
+<tr id="lst:phaseEvaluation-L355"><td class="ln">355</td><td class="lc"><code>                        finalPhase = phaseDiffMeanData[finalPhaseIdx]</code></td></tr>
+<tr id="lst:phaseEvaluation-L356"><td class="ln">356</td><td class="lc"><code>                        if (finalPhase &lt;= 40) and (finalPhase &gt;= -40):</code></td></tr>
+<tr id="lst:phaseEvaluation-L357"><td class="ln">357</td><td class="lc"><code>                            finalPhaseStr = str(round(finalPhase)) + &quot;%&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L358"><td class="ln">358</td><td class="lc"><code>                            for i in range(max(0, 4 - len(finalPhaseStr))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L359"><td class="ln">359</td><td class="lc"><code>                                finalPhaseStr += &quot;  &quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L360"><td class="ln">360</td><td class="lc"><code>                            axPlot.annotate(finalPhaseStr, </code></td></tr>
+<tr id="lst:phaseEvaluation-L361"><td class="ln">361</td><td class="lc"><code>                                            xy = (timeLimit, finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L362"><td class="ln">362</td><td class="lc"><code>                                            xytext = (timeLimit + (timeLimit * 0.02), finalPhase),</code></td></tr>
+<tr id="lst:phaseEvaluation-L363"><td class="ln">363</td><td class="lc"><code>                                            xycoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L364"><td class="ln">364</td><td class="lc"><code>                                            textcoords = &quot;data&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L365"><td class="ln">365</td><td class="lc"><code>                                            ha = &quot;left&quot;, </code></td></tr>
+<tr id="lst:phaseEvaluation-L366"><td class="ln">366</td><td class="lc"><code>                                            va = &quot;center&quot;,</code></td></tr>
+<tr id="lst:phaseEvaluation-L367"><td class="ln">367</td><td class="lc"><code>                                            arrowprops = dict(color = TDVPlotColors[tdv][0], arrowstyle = &quot;-&gt;&quot;),</code></td></tr>
+<tr id="lst:phaseEvaluation-L368"><td class="ln">368</td><td class="lc"><code>                                            annotation_clip = False,</code></td></tr>
+<tr id="lst:phaseEvaluation-L369"><td class="ln">369</td><td class="lc"><code>                                            color = TDVPlotColors[tdv][0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L370"><td class="ln">370</td><td class="lc"><code>                    axPlot.axhline(y = 0, color = TDVPlotColors[tdv][1], linewidth = 2, alpha = 0.5, linestyle = &quot;dashed&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L371"><td class="ln">371</td><td class="lc"><code>                    axPlot.axhline(y = tolerance * 100, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L372"><td class="ln">372</td><td class="lc"><code>                    axPlot.axhline(y = -tolerance * 100, color = &quot;red&quot;, linestyle = &quot;dashed&quot;, linewidth = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L373"><td class="ln">373</td><td class="lc"><code>                    axPlot.set_xlim([0, timeLimit])</code></td></tr>
+<tr id="lst:phaseEvaluation-L374"><td class="ln">374</td><td class="lc"><code>                    axPlot.set_ylim(-40, 40)</code></td></tr>
+<tr id="lst:phaseEvaluation-L375"><td class="ln">375</td><td class="lc"><code>                    axPlot.xaxis.set_major_locator(MultipleLocator(timeLimit / 10))</code></td></tr>
+<tr id="lst:phaseEvaluation-L376"><td class="ln">376</td><td class="lc"><code>                    axPlot.yaxis.set_major_locator(MultipleLocator(20))</code></td></tr>
+<tr id="lst:phaseEvaluation-L377"><td class="ln">377</td><td class="lc"><code>                    axPlot.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L378"><td class="ln">378</td><td class="lc"><code>                    if (testType != 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L379"><td class="ln">379</td><td class="lc"><code>                        axPlot.set_title(GetTDVOperationName(testType, tdv), fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L380"><td class="ln">380</td><td class="lc"><code>                if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L381"><td class="ln">381</td><td class="lc"><code>                    fig.suptitle(&quot;TDV ΔΦ Error vs. Time (&quot; + operation + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L382"><td class="ln">382</td><td class="lc"><code>                else:</code></td></tr>
+<tr id="lst:phaseEvaluation-L383"><td class="ln">383</td><td class="lc"><code>                    fig.suptitle(&quot;TDV ΔΦ Error vs. Time (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L384"><td class="ln">384</td><td class="lc"><code>                fig.supxlabel(&quot;Time (s)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L385"><td class="ln">385</td><td class="lc"><code>                fig.supylabel(&quot;ΔΦ Error (%)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L386"><td class="ln">386</td><td class="lc"><code>                handles, labels = [], []</code></td></tr>
+<tr id="lst:phaseEvaluation-L387"><td class="ln">387</td><td class="lc"><code>                for ax in axes.flatten():</code></td></tr>
+<tr id="lst:phaseEvaluation-L388"><td class="ln">388</td><td class="lc"><code>                    h, l = ax.get_legend_handles_labels()</code></td></tr>
+<tr id="lst:phaseEvaluation-L389"><td class="ln">389</td><td class="lc"><code>                    handles += h</code></td></tr>
+<tr id="lst:phaseEvaluation-L390"><td class="ln">390</td><td class="lc"><code>                    labels += l</code></td></tr>
+<tr id="lst:phaseEvaluation-L391"><td class="ln">391</td><td class="lc"><code>                fig.legend(handles, labels, ncols = 3, loc = &quot;lower left&quot;, fontsize = &quot;small&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L392"><td class="ln">392</td><td class="lc"><code>                plt.tight_layout()</code></td></tr>
+<tr id="lst:phaseEvaluation-L393"><td class="ln">393</td><td class="lc"><code>                if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L394"><td class="ln">394</td><td class="lc"><code>                    plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L395"><td class="ln">395</td><td class="lc"><code>                if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L396"><td class="ln">396</td><td class="lc"><code>                    fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\tocd_&quot; + str(tocd) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L397"><td class="ln">397</td><td class="lc"><code>                    os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L398"><td class="ln">398</td><td class="lc"><code>                    plt.savefig(fullSavePath + &quot;error_v_time.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L399"><td class="ln">399</td><td class="lc"><code>                plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L400"><td class="ln">400</td><td class="lc"><code>                plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L401"><td class="ln">401</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L402"><td class="ln">402</td><td class="lc"><code>def PlotErrorVsTocdPerOperation(data: dict, plotOperandA: bool, plotOperandB: bool, plotResult: bool, tolerance: float, maxIterLimit: int, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L403"><td class="ln">403</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L404"><td class="ln">404</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L405"><td class="ln">405</td><td class="lc"><code>            if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L406"><td class="ln">406</td><td class="lc"><code>                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L407"><td class="ln">407</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L408"><td class="ln">408</td><td class="lc"><code>            print(&quot;plotting TDV error vs. tocd for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L409"><td class="ln">409</td><td class="lc"><code>            plotData = {0 : {}, 1 : {}, 2 : {}}</code></td></tr>
+<tr id="lst:phaseEvaluation-L410"><td class="ln">410</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L411"><td class="ln">411</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L412"><td class="ln">412</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L413"><td class="ln">413</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L414"><td class="ln">414</td><td class="lc"><code>                            resultStatus = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;resultStatus&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L415"><td class="ln">415</td><td class="lc"><code>                            if (resultStatus not in plotData):</code></td></tr>
+<tr id="lst:phaseEvaluation-L416"><td class="ln">416</td><td class="lc"><code>                                print(&quot;WARNING: Unrecognized TDV result status value of &quot; + str(resultStatus) + &quot; encountered!&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L417"><td class="ln">417</td><td class="lc"><code>                                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L418"><td class="ln">418</td><td class="lc"><code>                            if (tocd not in plotData[resultStatus]):</code></td></tr>
+<tr id="lst:phaseEvaluation-L419"><td class="ln">419</td><td class="lc"><code>                                plotData[resultStatus][tocd] = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L420"><td class="ln">420</td><td class="lc"><code>                            phaseDiffs = np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;]) - data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L421"><td class="ln">421</td><td class="lc"><code>                            for i in range(min([maxIterLimit, len(phaseDiffs)])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L422"><td class="ln">422</td><td class="lc"><code>                                plotData[resultStatus][tocd].append(phaseDiffs[i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L423"><td class="ln">423</td><td class="lc"><code>            tocdLimits = [9999999, -9999999]</code></td></tr>
+<tr id="lst:phaseEvaluation-L424"><td class="ln">424</td><td class="lc"><code>            plt.figure(dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L425"><td class="ln">425</td><td class="lc"><code>            for tdv in plotData:</code></td></tr>
+<tr id="lst:phaseEvaluation-L426"><td class="ln">426</td><td class="lc"><code>                tocdData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L427"><td class="ln">427</td><td class="lc"><code>                phaseDiffMeanData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L428"><td class="ln">428</td><td class="lc"><code>                phaseDiffDevData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L429"><td class="ln">429</td><td class="lc"><code>                correctTocds = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L430"><td class="ln">430</td><td class="lc"><code>                for tocd in plotData[tdv]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L431"><td class="ln">431</td><td class="lc"><code>                    if (len(plotData[tdv][tocd]) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L432"><td class="ln">432</td><td class="lc"><code>                        if (((plotOperandA is True) and (tdv == 0)) or ((plotOperandB is True) and (tdv == 1)) or ((plotResult is True) and (tdv == 2))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L433"><td class="ln">433</td><td class="lc"><code>                            tocdData.append(tocd)</code></td></tr>
+<tr id="lst:phaseEvaluation-L434"><td class="ln">434</td><td class="lc"><code>                            phaseDiffMeanData.append(np.mean(plotData[tdv][tocd]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L435"><td class="ln">435</td><td class="lc"><code>                            phaseDiffDevData.append(np.std(plotData[tdv][tocd]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L436"><td class="ln">436</td><td class="lc"><code>                            if (GetPhaseDiffCorrectNum(plotData[tdv][tocd], targetDuty, tolerance) &gt;= (len(plotData[tdv][tocd]))):</code></td></tr>
+<tr id="lst:phaseEvaluation-L437"><td class="ln">437</td><td class="lc"><code>                                if (tocd not in correctTocds):</code></td></tr>
+<tr id="lst:phaseEvaluation-L438"><td class="ln">438</td><td class="lc"><code>                                    correctTocds.append(tocd)</code></td></tr>
+<tr id="lst:phaseEvaluation-L439"><td class="ln">439</td><td class="lc"><code>                if (len(tocdData) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L440"><td class="ln">440</td><td class="lc"><code>                    phaseDiffMeanData = (np.array(phaseDiffMeanData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L441"><td class="ln">441</td><td class="lc"><code>                    phaseDiffDevData = (np.array(phaseDiffDevData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L442"><td class="ln">442</td><td class="lc"><code>                    plt.plot(tocdData, phaseDiffMeanData, c = TDVPlotColors[tdv][0], linewidth = 2, label = GetTDVOperationName(testType, tdv))</code></td></tr>
+<tr id="lst:phaseEvaluation-L443"><td class="ln">443</td><td class="lc"><code>                    plt.fill_between(tocdData, phaseDiffMeanData - phaseDiffDevData, phaseDiffMeanData + phaseDiffDevData, color = TDVPlotColors[tdv][0], alpha = 0.2)</code></td></tr>
+<tr id="lst:phaseEvaluation-L444"><td class="ln">444</td><td class="lc"><code>                    tocdLimits[0] = min([tocdLimits[0], min(tocdData)])</code></td></tr>
+<tr id="lst:phaseEvaluation-L445"><td class="ln">445</td><td class="lc"><code>                    tocdLimits[1] = max([tocdLimits[1], max(tocdData)])</code></td></tr>
+<tr id="lst:phaseEvaluation-L446"><td class="ln">446</td><td class="lc"><code>                if (tdv == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L447"><td class="ln">447</td><td class="lc"><code>                    for tocd in correctTocds:</code></td></tr>
+<tr id="lst:phaseEvaluation-L448"><td class="ln">448</td><td class="lc"><code>                        plt.axvline(x = tocd, color = TDVPlotColors[1][0], alpha = 0.5, linestyle = &quot;dashed&quot;, linewidth = 0.3)</code></td></tr>
+<tr id="lst:phaseEvaluation-L449"><td class="ln">449</td><td class="lc"><code>            plt.axhline(y = 0, color = &quot;black&quot;, linewidth = 2, alpha = 0.5, linestyle = &quot;dashed&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L450"><td class="ln">450</td><td class="lc"><code>            plt.title(&quot;TDV ΔΦ Error vs. $t_{ocd}$ (&quot; + operation + &quot;)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L451"><td class="ln">451</td><td class="lc"><code>            plt.xlim(tocdLimits)</code></td></tr>
+<tr id="lst:phaseEvaluation-L452"><td class="ln">452</td><td class="lc"><code>            plt.ylim(-100, 100)</code></td></tr>
+<tr id="lst:phaseEvaluation-L453"><td class="ln">453</td><td class="lc"><code>            plt.grid(which = &quot;both&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L454"><td class="ln">454</td><td class="lc"><code>            plt.xlabel(&quot;$t_{ocd}$ (μs)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L455"><td class="ln">455</td><td class="lc"><code>            plt.ylabel(&quot;ΔΦ Error (%)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L456"><td class="ln">456</td><td class="lc"><code>            if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L457"><td class="ln">457</td><td class="lc"><code>                plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L458"><td class="ln">458</td><td class="lc"><code>            if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L459"><td class="ln">459</td><td class="lc"><code>                fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L460"><td class="ln">460</td><td class="lc"><code>                os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L461"><td class="ln">461</td><td class="lc"><code>                plt.savefig(fullSavePath + &quot;error_v_tocd.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L462"><td class="ln">462</td><td class="lc"><code>            plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L463"><td class="ln">463</td><td class="lc"><code>            plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L464"><td class="ln">464</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L465"><td class="ln">465</td><td class="lc"><code>def PlotResultErrorVsOperandValuesPerOperation(data: dict, maxIterLimit: int, show: bool, savePath: str) -&gt; None:</code></td></tr>
+<tr id="lst:phaseEvaluation-L466"><td class="ln">466</td><td class="lc"><code>    for targetDuty in data:</code></td></tr>
+<tr id="lst:phaseEvaluation-L467"><td class="ln">467</td><td class="lc"><code>        for testType in data[targetDuty]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L468"><td class="ln">468</td><td class="lc"><code>            if (testType == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L469"><td class="ln">469</td><td class="lc"><code>                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L470"><td class="ln">470</td><td class="lc"><code>            operation = OperationTypes[testType]</code></td></tr>
+<tr id="lst:phaseEvaluation-L471"><td class="ln">471</td><td class="lc"><code>            for tocd in data[targetDuty][testType]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L472"><td class="ln">472</td><td class="lc"><code>                print(&quot;plotting TDV result error vs. operands for &quot; + operation + &quot; (&quot; + str(targetDuty) + &quot;, &quot; + str(tocd) + &quot;)...&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L473"><td class="ln">473</td><td class="lc"><code>                plotData = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L474"><td class="ln">474</td><td class="lc"><code>                for testIdx in data[targetDuty][testType][tocd]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L475"><td class="ln">475</td><td class="lc"><code>                    for runIdx in data[targetDuty][testType][tocd][testIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L476"><td class="ln">476</td><td class="lc"><code>                        currOperands = [-1, -1]</code></td></tr>
+<tr id="lst:phaseEvaluation-L477"><td class="ln">477</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L478"><td class="ln">478</td><td class="lc"><code>                            resultStatus = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;resultStatus&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L479"><td class="ln">479</td><td class="lc"><code>                            if (resultStatus == 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L480"><td class="ln">480</td><td class="lc"><code>                                currOperands[0] = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L481"><td class="ln">481</td><td class="lc"><code>                            elif (resultStatus == 1):</code></td></tr>
+<tr id="lst:phaseEvaluation-L482"><td class="ln">482</td><td class="lc"><code>                                currOperands[1] = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L483"><td class="ln">483</td><td class="lc"><code>                            if ((currOperands[0] == -1) and (currOperands[1] == -1)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L484"><td class="ln">484</td><td class="lc"><code>                                print(&quot;WARNING: Encountered erroneous operands!&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L485"><td class="ln">485</td><td class="lc"><code>                                continue</code></td></tr>
+<tr id="lst:phaseEvaluation-L486"><td class="ln">486</td><td class="lc"><code>                        currOperandIdx = (currOperands[0], currOperands[1])</code></td></tr>
+<tr id="lst:phaseEvaluation-L487"><td class="ln">487</td><td class="lc"><code>                        for tdv in data[targetDuty][testType][tocd][testIdx][runIdx]:</code></td></tr>
+<tr id="lst:phaseEvaluation-L488"><td class="ln">488</td><td class="lc"><code>                            resultStatus = data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;resultStatus&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L489"><td class="ln">489</td><td class="lc"><code>                            if (resultStatus == 2):</code></td></tr>
+<tr id="lst:phaseEvaluation-L490"><td class="ln">490</td><td class="lc"><code>                                if (currOperandIdx not in plotData):</code></td></tr>
+<tr id="lst:phaseEvaluation-L491"><td class="ln">491</td><td class="lc"><code>                                    plotData[currOperandIdx] = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L492"><td class="ln">492</td><td class="lc"><code>                                phaseDiffs = np.array(data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;phases&quot;]) - data[targetDuty][testType][tocd][testIdx][runIdx][tdv][&quot;targetPhase&quot;]</code></td></tr>
+<tr id="lst:phaseEvaluation-L493"><td class="ln">493</td><td class="lc"><code>                                for i in range(min([maxIterLimit, len(phaseDiffs)])):</code></td></tr>
+<tr id="lst:phaseEvaluation-L494"><td class="ln">494</td><td class="lc"><code>                                    plotData[currOperandIdx].append(phaseDiffs[i])</code></td></tr>
+<tr id="lst:phaseEvaluation-L495"><td class="ln">495</td><td class="lc"><code>                operandAData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L496"><td class="ln">496</td><td class="lc"><code>                operandBData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L497"><td class="ln">497</td><td class="lc"><code>                resultDiffMeanData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L498"><td class="ln">498</td><td class="lc"><code>                resultDiffDevData = []</code></td></tr>
+<tr id="lst:phaseEvaluation-L499"><td class="ln">499</td><td class="lc"><code>                for operands in plotData:</code></td></tr>
+<tr id="lst:phaseEvaluation-L500"><td class="ln">500</td><td class="lc"><code>                    if (len(plotData[operands]) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L501"><td class="ln">501</td><td class="lc"><code>                        operandAData.append(operands[0])</code></td></tr>
+<tr id="lst:phaseEvaluation-L502"><td class="ln">502</td><td class="lc"><code>                        operandBData.append(operands[1])</code></td></tr>
+<tr id="lst:phaseEvaluation-L503"><td class="ln">503</td><td class="lc"><code>                        resultDiffMeanData.append(np.mean(plotData[operands]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L504"><td class="ln">504</td><td class="lc"><code>                        resultDiffDevData.append(np.std(plotData[operands]))</code></td></tr>
+<tr id="lst:phaseEvaluation-L505"><td class="ln">505</td><td class="lc"><code>                operandAData = (np.array(operandAData) / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L506"><td class="ln">506</td><td class="lc"><code>                operandBData = (np.array(operandBData) / targetDuty) * 180</code></td></tr>
+<tr id="lst:phaseEvaluation-L507"><td class="ln">507</td><td class="lc"><code>                resultDiffMeanData = (np.array(resultDiffMeanData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L508"><td class="ln">508</td><td class="lc"><code>                resultDiffDevData = (np.array(resultDiffDevData) / targetDuty) * 100</code></td></tr>
+<tr id="lst:phaseEvaluation-L509"><td class="ln">509</td><td class="lc"><code>                fig = plt.figure(figsize = (8, 6), dpi = 300)</code></td></tr>
+<tr id="lst:phaseEvaluation-L510"><td class="ln">510</td><td class="lc"><code>                if ((testType == 1) or (testType == 2)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L511"><td class="ln">511</td><td class="lc"><code>                    ax = fig.add_subplot()</code></td></tr>
+<tr id="lst:phaseEvaluation-L512"><td class="ln">512</td><td class="lc"><code>                    img = ax.scatter(operandAData, resultDiffMeanData, c = resultDiffDevData, vmin = 0, vmax = 20, cmap = &quot;viridis&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L513"><td class="ln">513</td><td class="lc"><code>                    ax.axhline(y = 0, linewidth = 2.0, color = &quot;black&quot;, linestyle = &quot;dashed&quot;, alpha = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L514"><td class="ln">514</td><td class="lc"><code>                    ax.set_xlim(0, 180)</code></td></tr>
+<tr id="lst:phaseEvaluation-L515"><td class="ln">515</td><td class="lc"><code>                    ax.set_ylim(-100, 100)</code></td></tr>
+<tr id="lst:phaseEvaluation-L516"><td class="ln">516</td><td class="lc"><code>                    ax.grid()</code></td></tr>
+<tr id="lst:phaseEvaluation-L517"><td class="ln">517</td><td class="lc"><code>                    ax.set_xlabel(&quot;Operand ΔΦ (°)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L518"><td class="ln">518</td><td class="lc"><code>                    ax.set_ylabel(&quot;Result ΔΦ Error (%)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L519"><td class="ln">519</td><td class="lc"><code>                    ax.set_position([ax.get_position().x0, ax.get_position().y0, ax.get_position().width * 0.9, ax.get_position().height])</code></td></tr>
+<tr id="lst:phaseEvaluation-L520"><td class="ln">520</td><td class="lc"><code>                    cax = fig.add_axes([0.87, 0.2, 0.02, 0.6])</code></td></tr>
+<tr id="lst:phaseEvaluation-L521"><td class="ln">521</td><td class="lc"><code>                    fig.colorbar(img, orientation = &quot;vertical&quot;, cax = cax, label = &quot;Result Error Deviation&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L522"><td class="ln">522</td><td class="lc"><code>                    fig.suptitle(&quot;TDV Operation Result ΔΦ Error vs. Operand ΔΦ (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L523"><td class="ln">523</td><td class="lc"><code>                else:</code></td></tr>
+<tr id="lst:phaseEvaluation-L524"><td class="ln">524</td><td class="lc"><code>                    ax = fig.add_subplot(111, projection = &quot;3d&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L525"><td class="ln">525</td><td class="lc"><code>                    img = ax.scatter(operandAData, operandBData, resultDiffMeanData, c = resultDiffDevData, vmin = 0, vmax = 20, cmap = &quot;viridis&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L526"><td class="ln">526</td><td class="lc"><code>                    ax.plot([0, 180], [180, 180], [0, 0], linewidth = 2.0, color = &quot;black&quot;, linestyle = &quot;dashed&quot;, alpha = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L527"><td class="ln">527</td><td class="lc"><code>                    ax.plot([0, 0], [0, 180], [0, 0], linewidth = 2.0, color = &quot;black&quot;, linestyle = &quot;dashed&quot;, alpha = 0.5)</code></td></tr>
+<tr id="lst:phaseEvaluation-L528"><td class="ln">528</td><td class="lc"><code>                    ax.set_xlim([0, 180])</code></td></tr>
+<tr id="lst:phaseEvaluation-L529"><td class="ln">529</td><td class="lc"><code>                    ax.set_ylim([0, 180])</code></td></tr>
+<tr id="lst:phaseEvaluation-L530"><td class="ln">530</td><td class="lc"><code>                    ax.set_zlim([-100, 100])</code></td></tr>
+<tr id="lst:phaseEvaluation-L531"><td class="ln">531</td><td class="lc"><code>                    ax.set_xlabel(&quot;Operand A ΔΦ (°)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L532"><td class="ln">532</td><td class="lc"><code>                    ax.set_ylabel(&quot;Operand B ΔΦ (°)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L533"><td class="ln">533</td><td class="lc"><code>                    ax.set_zlabel(&quot;Result ΔΦ Error (%)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L534"><td class="ln">534</td><td class="lc"><code>                    ax.set_position([ax.get_position().x0 + 0.03, ax.get_position().y0, ax.get_position().width, ax.get_position().height])</code></td></tr>
+<tr id="lst:phaseEvaluation-L535"><td class="ln">535</td><td class="lc"><code>                    cax = fig.add_axes([0.03, 0.2, 0.03, 0.6])</code></td></tr>
+<tr id="lst:phaseEvaluation-L536"><td class="ln">536</td><td class="lc"><code>                    fig.colorbar(img, orientation = &quot;vertical&quot;, cax = cax, label = &quot;Result Error Deviation&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L537"><td class="ln">537</td><td class="lc"><code>                    fig.suptitle(&quot;TDV Operation Result ΔΦ Error vs. Operand ΔΦ (&quot; + operation + &quot;, $t_{ocd}$: &quot; + str(tocd) + &quot; μs)&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L538"><td class="ln">538</td><td class="lc"><code>                if (show is True):</code></td></tr>
+<tr id="lst:phaseEvaluation-L539"><td class="ln">539</td><td class="lc"><code>                    plt.show()</code></td></tr>
+<tr id="lst:phaseEvaluation-L540"><td class="ln">540</td><td class="lc"><code>                if (len(savePath) &gt; 0):</code></td></tr>
+<tr id="lst:phaseEvaluation-L541"><td class="ln">541</td><td class="lc"><code>                    fullSavePath = savePath + &quot;operating_cycles_&quot; + str(targetDuty) + &quot;\\&quot; + operation + &quot;\\tocd_&quot; + str(tocd) + &quot;\\&quot;</code></td></tr>
+<tr id="lst:phaseEvaluation-L542"><td class="ln">542</td><td class="lc"><code>                    os.makedirs(fullSavePath, exist_ok = True)</code></td></tr>
+<tr id="lst:phaseEvaluation-L543"><td class="ln">543</td><td class="lc"><code>                    plt.savefig(fullSavePath + &quot;result_vs_operands.png&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L544"><td class="ln">544</td><td class="lc"><code>                plt.clf()</code></td></tr>
+<tr id="lst:phaseEvaluation-L545"><td class="ln">545</td><td class="lc"><code>                plt.close()</code></td></tr>
+<tr id="lst:phaseEvaluation-L546"><td class="ln">546</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L547"><td class="ln">547</td><td class="lc"><code>def main():</code></td></tr>
+<tr id="lst:phaseEvaluation-L548"><td class="ln">548</td><td class="lc"><code>    print(&quot;---- SCRIPT STARTED ----\n&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L549"><td class="ln">549</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L550"><td class="ln">550</td><td class="lc"><code>    files = GetFilesInDir(FilesPath)</code></td></tr>
+<tr id="lst:phaseEvaluation-L551"><td class="ln">551</td><td class="lc"><code>    data = {}</code></td></tr>
+<tr id="lst:phaseEvaluation-L552"><td class="ln">552</td><td class="lc"><code>    for filePath in files:</code></td></tr>
+<tr id="lst:phaseEvaluation-L553"><td class="ln">553</td><td class="lc"><code>        if (filePath.endswith(&quot;.txt&quot;) or filePath.endswith(&quot;.TXT&quot;)):</code></td></tr>
+<tr id="lst:phaseEvaluation-L554"><td class="ln">554</td><td class="lc"><code>            ReadDataFromFile(data, filePath)</code></td></tr>
+<tr id="lst:phaseEvaluation-L555"><td class="ln">555</td><td class="lc"><code>    PlotValuesVsTimePerTestRunAll(data, 1, False, &quot;plots\\values_v_time\\&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L556"><td class="ln">556</td><td class="lc"><code>    PlotErrorVsTimePerOperationAll(data, 0.1, 1, False, &quot;plots\\error_v_time\\&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L557"><td class="ln">557</td><td class="lc"><code>    #PlotErrorVsTocdPerOperation(data, False, False, True, 0.1, 1, False, &quot;plots\\error_v_tocd\\&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L558"><td class="ln">558</td><td class="lc"><code>    PlotResultErrorVsOperandValuesPerOperation(data, 2, False, &quot;plots\\result_v_operands\\&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L559"><td class="ln">559</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L560"><td class="ln">560</td><td class="lc"><code>    print(&quot;\n\n---- SCRIPT FINISHED ----&quot;)</code></td></tr>
+<tr id="lst:phaseEvaluation-L561"><td class="ln">561</td><td class="lc"><code>&nbsp;</code></td></tr>
+<tr id="lst:phaseEvaluation-L562"><td class="ln">562</td><td class="lc"><code>if (__name__ == &quot;__main__&quot;):</code></td></tr>
+<tr id="lst:phaseEvaluation-L563"><td class="ln">563</td><td class="lc"><code>    main()</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+<script>
+/* scroll position persistence */
+(function(){
+  var key='sp:'+location.pathname;
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  window.addEventListener('load',function(){
+    var y=sessionStorage.getItem(key);
+    if(y) window.scrollTo({top:+y,behavior:"instant"});
+  });
+  var t;
+  window.addEventListener('scroll',function(){
+    clearTimeout(t);
+    t=setTimeout(function(){sessionStorage.setItem(key,window.scrollY);},150);
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

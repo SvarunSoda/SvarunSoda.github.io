@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Appendix C: Storage Evaluation Data (10 s) – PHOSCO Thesis</title>
+<style>
+:root{--bg:#f7f0e2;--bg2:#ede4ce;--bg3:#e0d4b8;--card:#fbf6eb;
+  --border:#c8b890;--accent:#2e2c24;--text:#1c1a14;--muted:#5e5a4e;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);
+  font-family:'Times New Roman',Times,serif;font-size:.93rem;line-height:1.7;
+  overflow-x:hidden;}
+nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.8rem;background:rgba(247,240,226,.97);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.nav-back{display:flex;align-items:center;gap:.45rem;
+  text-decoration:none;color:var(--muted);font-size:.82rem;transition:color .2s;}
+.nav-back:hover{color:var(--text);}
+.nav-title{font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text);font-weight:700;}
+.page-wrap{max-width:1100px;margin:0 auto;padding:5rem 2rem 6rem;}
+h1{font-size:1.4rem;font-weight:bold;color:var(--accent);
+  margin-bottom:1.6rem;padding-bottom:.4rem;border-bottom:2px solid var(--border);}
+p{text-align:justify;margin-bottom:.85rem;}
+/* Figure display */
+.app-figure{display:table;margin:1.8rem auto;max-width:min(100%,1060px);}
+.app-figure img{display:block;width:100%;height:auto;
+  border:1px solid var(--border);border-radius:6px 6px 0 0;background:#fff;
+  cursor:zoom-in;transition:opacity .15s;}
+.app-figure img:hover{opacity:.92;}
+.subfig-row{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;
+  margin-bottom:.5rem;}
+.subfig{flex:1 1 180px;max-width:240px;text-align:center;}
+.subfig img{width:100%;height:auto;border:1px solid var(--border);
+  border-radius:4px;background:#fff;}
+.subfig .sub-cap{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
+.fig-cap{display:block;font-size:.78rem;color:var(--muted);
+  background:var(--bg3);border-radius:0 0 4px 4px;padding:.5rem .8rem;
+  text-align:center;line-height:1.55;}
+.fig-cap strong{color:#1c1a14;font-weight:bold;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../thesis.html" class="nav-back"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Thesis</a>
+  <span class="nav-title">Appendix C – Storage Evaluation Data (10 s)</span>
+</nav>
+<div class="page-wrap">
+<h1>Appendix C: Storage Evaluation Data (10 s)</h1>
+<div class="app-figure" id="fig:storageResultsData">
+  <img src="../assets/thesis/images/appendix_c/137.png" alt="Storage evaluation data" loading="lazy"
+       style="border-radius:6px 6px 0 0;">
+  <div class="fig-cap"><strong>Figure C.1:</strong> Collective TDV storage error evaluation data over a 10-second tracking period.</div>
+</div>
+</div>
+<script>
+/* scroll position persistence */
+(function(){
+  var key='sp:'+location.pathname;
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  window.addEventListener('load',function(){
+    var y=sessionStorage.getItem(key);
+    if(y) window.scrollTo({top:+y,behavior:"instant"});
+  });
+  var t;
+  window.addEventListener('scroll',function(){
+    clearTimeout(t);
+    t=setTimeout(function(){sessionStorage.setItem(key,window.scrollY);},150);
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
